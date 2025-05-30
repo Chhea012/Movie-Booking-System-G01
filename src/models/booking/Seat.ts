@@ -1,3 +1,5 @@
+import { ZipZone } from "../enum/ZipZone";
+
 export class Seat{
     constructor(
         private seatId: string,
