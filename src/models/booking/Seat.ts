@@ -1,4 +1,4 @@
-class Seat{
+export class Seat{
     constructor(
         private seatId: string,
         private row: string,

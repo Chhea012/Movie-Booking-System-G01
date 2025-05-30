@@ -1,4 +1,4 @@
-class Notifications {
+export class Notifications {
     constructor(
         private idNotification: string,
         private message: string,
