@@ -1,4 +1,4 @@
-enum ZipZone {
+export enum ZipZone {
     STANDARD = "standard",
     PREMIUN = "premium",
     VIP = "VIP"

@@ -1,3 +1,4 @@
+import { Movie } from "../showtime/Movie";
 import { User } from "../user/User";
 
 export class Review {
@@ -7,6 +8,7 @@ export class Review {
     private showTime : string,
     private rating : string,
     private comment : string,
-    private user : User
+    private user : User,
+    private movie : Movie
     ){}
 }
