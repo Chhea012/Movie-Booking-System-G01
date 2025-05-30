@@ -1,3 +1,5 @@
+import { User } from "../user/User";
+
 export class Review {
     
     constructor(
@@ -5,6 +7,6 @@ export class Review {
     private showTime : string,
     private rating : string,
     private comment : string,
-    // private user : User
+    private user : User
     ){}
 }
