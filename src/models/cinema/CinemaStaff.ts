@@ -1,6 +1,7 @@
 import { Person } from "../user/Person";
 import { Cinema } from "./Cinema";
 import { Ticket } from "../booking/Ticket";
+import { User } from "../user/User";
 
 export class CinemaStaff extends Person {
     constructor(
@@ -59,4 +60,6 @@ export class CinemaStaff extends Person {
         }
         this.cinema = cinema;
     }
+
+    
 }
