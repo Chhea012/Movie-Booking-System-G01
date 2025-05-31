@@ -8,4 +8,6 @@ export class ShowTime{
                 private movieRoom : MovieRoom,
                 private movie: Movie,
     ) {}
+
+    
 }
