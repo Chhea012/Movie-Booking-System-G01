@@ -28,7 +28,10 @@ export class Movie {
     getReviews(): Review[] {    
         return this.review;
     }
-
+    // added method to get movie title
+    getTitle(): string {
+        return this.title;  
+    }
     getAverageRating(): number {
         if (this.review.length === 0) return 0;
         const totalRating = this.review.reduce((sum, review) => sum + parseFloat(review.getRating()), 0);

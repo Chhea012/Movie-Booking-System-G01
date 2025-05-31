@@ -100,4 +100,8 @@ export class ShowTime {
     hasSeatsAvailable(): boolean {
         return this.getAvailableSeats().length > 0;
     }
+// Add methods to get start and end times
+    getStartTime(): string {
+        return this.startTime;
+    }
 }

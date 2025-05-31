@@ -15,4 +15,9 @@ export class Booking {
         private cancellation? : Cancellation,
 
     ){}
+
+    // added method getID
+    public getId(): string {
+        return this.id;
+    }
 }
