@@ -3,7 +3,6 @@ import { MovieRoom } from "./MovieRoom";
 import { Seat } from "../booking/Seat";
 import { ZipZone } from "../enum/ZipZone";
 
-<<<<<<< HEAD
 export class ShowTime {
     private showtimeId: string;
 
@@ -101,15 +100,4 @@ export class ShowTime {
     hasSeatsAvailable(): boolean {
         return this.getAvailableSeats().length > 0;
     }
-=======
-export class ShowTime{
-    constructor(private startTime:string,
-                private endTime:string,
-                private price:number,
-                private movieRoom : MovieRoom,
-                private movie: Movie,
-    ) {}
-
-    
->>>>>>> dc9ee9ceb568db8e2971c226b6b272f5e5fc3d35
 }
