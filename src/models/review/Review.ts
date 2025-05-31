@@ -11,4 +11,17 @@ export class Review {
     private user : User,
     private movie : Movie
     ){}
+    //create method updateReview
+    updateReview(rating: string, comment: string): void {
+        this.rating = rating;
+        this.comment = comment;
+    }
+    //create method getUser
+    getUser(): User {
+        return this.user;
+    }
+    //create method getMovie
+    getMovie(): Movie {
+        return this.movie;
+    }
 }
