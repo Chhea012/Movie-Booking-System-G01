@@ -5,40 +5,52 @@ import { SeatStatus } from "../enum/SeatStatus";
 
 export class MovieRoom {
     constructor(
-        private id :string,
-        private name : string,
-        private cinema : Cinema,
+        private id: string,
+        private name: string,
+        private cinema: Cinema,
         private seats: Seat[] = [],
-        private showtime : ShowTime [] = []
-    ){}
-    //create method addseat
+        private showtime: ShowTime[] = []
+    ) {}
+
+    // Add a seat to the room
     addSeat(seat: Seat): void {
         this.seats.push(seat);
         seat.setMovieRoom(this); // Set bidirectional relationship
     }
-    //create method removedseat
+
+    // Remove a seat by ID
     removeSeat(seatId: string): void {
-        this.seats = this.seats.filter(seat => seat.getSeatId() !== seatId); // Assumes getSeatId() exists
+        this.seats = this.seats.filter(seat => seat.getSeatId() !== seatId);
     }
-    //create method getseat
+
+    // Get all seats
     getSeats(): Seat[] {
         return [...this.seats];
     }
-    //create method getavailableseats
+
+    // Get available seats
     getAvailableSeats(): Seat[] {
-        return this.seats.filter(seat => seat.getStatus() === SeatStatus.AVAILABLE); // Assumes getStatus() exists
+        return this.seats.filter(seat => seat.getStatus() === SeatStatus.AVAILABLE);
     }
-    //create method updatedetails
+
+    // Update room details
     updateDetails(roomId: string, name: string): void {
         this.id = roomId;
         this.name = name;
     }
-    //create method getcinema
+
+    // Get cinema
     getCinema(): Cinema {
         return this.cinema;
     }
-    //create method viewseatavailability
+
+    // View seat availability
     viewSeatAvailability(): Seat[] {
         return this.getAvailableSeats();
+    }
+
+    // Get showtimes
+    getShowtimes(): ShowTime[] {
+        return [...this.showtime];
     }
 }

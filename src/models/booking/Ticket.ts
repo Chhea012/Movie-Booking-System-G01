@@ -1,38 +1,42 @@
 import { Booking } from "./Booking";
 import { Seat } from "./Seat";
 
-export class Ticket{
+export class Ticket {
     constructor(
-        private  ticketId: string,
+        private ticketId: string,
         private qrCode: string,
         private issueDate: string,
-        private seat : Seat,
+        private seat: Seat,
         private booking?: Booking
-        
-    ){}
-    //create method updatePrice
+    ) {}
+
+    // Update ticket price by updating the seat's price
     updatePrice(price: number): void {
         this.seat.updateDetails(
             this.seat.getSeatId(),
-            this.seat.getRow(), // Assumes Seat has getRow()
-            this.seat.getSeatNum(), // Assumes Seat has getSeatNum()
-            this.seat.getZipZone().toString(), // Assumes Seat has getZipZone()
+            this.seat.getRow(),
+            this.seat.getSeatNum(),
+            this.seat.getZipZone(), // Pass ZipZone directly
             price
         );
     }
-    //create method getSeat
+
+    // Get seat
     getSeat(): Seat {
         return this.seat;
     }
-    //create method getBooking
+
+    // Get booking
     getBooking(): Booking | null {
         return this.booking || null;
-    } 
-    //create method updateIssueDate
+    }
+
+    // Update issue date
     updateIssueDate(issueDate: string): void {
         this.issueDate = issueDate;
     }
-    //create method generateQRCode
+
+    // Generate QR code
     generateQRCode(): string {
         return `QR-${this.ticketId}-${new Date().toISOString()}`;
     }
