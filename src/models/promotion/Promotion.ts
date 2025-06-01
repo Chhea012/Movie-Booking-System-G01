@@ -19,7 +19,7 @@ export class Promotion {
         this.descript = descript;
         this.isActive = isActive
     }
-    get isactive(): boolean {
+    getisActive(): boolean {
         return this.isActive; 
     }
 

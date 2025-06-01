@@ -6,6 +6,7 @@ import { Seat } from "./Seat";
 import { Ticket } from "./Ticket";
 
 export class Booking {
+    private status: string;
     constructor(
         private id : string,
         private userId : string,
@@ -17,7 +18,9 @@ export class Booking {
         private cancellation? : Cancellation,
         private promotion? : Promotion
 
-    ){}
+    ){
+        this.status = "PENDING";
+    }
     getId(): string {
         return this.id;
     }
@@ -52,5 +55,13 @@ export class Booking {
 
     getPromotion(): Promotion | undefined {
         return this.promotion;
+    }
+    // Added method to set the booking status
+    setStatus(status: string): void {
+        this.status = status;
+    }
+    // Getter for status
+    getStatus(): string {
+        return this.status;
     }
 }
