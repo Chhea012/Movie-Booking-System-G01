@@ -7,6 +7,7 @@ import { Ticket } from "./Ticket";
 
 export class Booking {
     private status: string;
+    private date: Date;
     constructor(
         private id : string,
         private userId : string,
@@ -20,12 +21,13 @@ export class Booking {
 
     ){
         this.status = "PENDING";
+        this.date = new Date();
     }
     getId(): string {
         return this.id;
     }
 
-    getUserId(): string { // Renamed to camelCase
+    getUserId(): string { 
         return this.userId;
     }
 
@@ -63,5 +65,8 @@ export class Booking {
     // Getter for status
     getStatus(): string {
         return this.status;
+    }
+    getDate(): Date {
+        return this.date; // New method for user story 4
     }
 }
