@@ -1,6 +1,8 @@
 import { Booking } from "./models/booking/Booking";
+import { BookingHistory } from "./models/booking/BookingHistory";
 import { Cancellation } from "./models/booking/Cancellation";
 import { Payment } from "./models/booking/Payment";
+import { PaymentStatus } from "./models/enum/PaymentStatus";
 import { Promotion } from "./models/promotion/Promotion";
 import { User } from "./models/user/User";
 
