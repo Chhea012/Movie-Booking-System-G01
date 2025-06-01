@@ -9,4 +9,27 @@ export class Payment {
         private paymentMethod : string,
         private total : number
     ){}
+    getPaymentId(): number {
+        return this.paymentId;
+    }
+
+    getBooking(): Booking {
+        return this.booking;
+    }
+
+    getTaxes(): number {
+        return this.taxes;
+    }
+
+    getBookingFee(): number {
+        return this.bookingFee;
+    }
+
+    getPaymentMethod(): string {
+        return this.paymentMethod;
+    }
+
+    getTotal(): number {
+        return this.total;
+    }
 }
