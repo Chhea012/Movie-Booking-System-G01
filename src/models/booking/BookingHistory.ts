@@ -5,7 +5,8 @@ export class BookingHistory {
     constructor(
         private historyId: string, 
         private userId: string,   
-        private bookings: Booking[] = [] 
+        private bookings: Booking[] = [],
+        private entries: string[] = []
     ) {}
 
     getHistoryId(): string {
@@ -48,5 +49,17 @@ export class BookingHistory {
         } else {
             throw new Error(`Booking with ID ${bookingId} not found`);
         }
+    }
+    // New method to add a history entry
+    addEntry(entry: string): void {
+        if (!entry) {
+            throw new Error("Entry cannot be empty");
+        }
+        this.entries.push(entry);
+    }
+
+    // Optional: Method to retrieve all history entries
+    getEntries(): string[] {
+        return this.entries;
     }
 }
