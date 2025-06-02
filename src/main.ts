@@ -1,4 +1,9 @@
+import { Booking } from "./models/booking/Booking";
+import { Cancellation } from "./models/booking/Cancellation";
+import { Payment } from "./models/booking/Payment";
+import { Promotion } from "./models/promotion/Promotion";
 import { User } from "./models/user/User";
+
 
 let soda = new User(
     "giyu",
@@ -15,4 +20,14 @@ console.log("Logged in user :", soda.getName());
 
 
 
+
+// View all registered users
+console.log(User.getAllUsers());
+
+
+
+//test for promotion
+const promotion = new Promotion(1, "MOVIE10", 10, "10% off action movies", true);
+console.log(promotion.applyDiscount(100)); // Outputs 90
+console.log(promotion.validateCode("MOVIE10")); // Outputs true
 

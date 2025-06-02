@@ -16,6 +16,7 @@ export abstract class Person{
         this.phone = phone;
     }
    
+    
 
     public getName(): string{
         return this.name

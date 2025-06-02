@@ -84,7 +84,7 @@ export class ShowTime {
     }
 
     isShowtimeActive(): boolean {
-        const now = new Date("2025-05-31T11:16:00+07:00"); // Updated to current time
+        const now = new Date();
         const start = new Date(this.startTime);
         const end = new Date(this.endTime);
         return now >= start && now <= end;
@@ -99,5 +99,9 @@ export class ShowTime {
 
     hasSeatsAvailable(): boolean {
         return this.getAvailableSeats().length > 0;
+    }
+// Add methods to get start and end times
+    getStartTime(): string {
+        return this.startTime;
     }
 }
