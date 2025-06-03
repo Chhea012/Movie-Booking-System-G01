@@ -2,36 +2,21 @@ import { PaymentStatus } from "../enum/PaymentStatus";
 import { Booking } from "./Booking";
 
 export class Payment {
-    private paymentId: number;
-    private booking: Booking;
-    private taxes: number;
-    private bookingFee: number;
-    private paymentMethod: string;
-    private total: number;
-    private status: PaymentStatus;
+    private taxes: number = 0;
+    private bookingFee: number = 0;
 
     constructor(
-        paymentId: number,
-        booking: Booking,
-        total: number,
-        taxes: number = 0,
-        bookingFee: number = 0,
-        paymentMethod: string = "",
-        status: PaymentStatus = PaymentStatus.PPENDING 
+        private paymentId: number,
+        private booking: Booking,
+        private total: number,
+        private paymentMethod: string = "",
+        private status: PaymentStatus = PaymentStatus.PPENDING
     ) {
         if (!paymentId || !booking || total <= 0) {
             throw new Error("Payment ID, booking, and valid total amount are required");
         }
-        this.paymentId = paymentId;
-        this.booking = booking;
-        this.total = total;
-        this.taxes = taxes;
-        this.bookingFee = bookingFee;
-        this.paymentMethod = paymentMethod;
-        this.status = status;
     }
 
-    // Rest of the methods remain the same
     processPayment(amount: number, paymentMethod: string): void {
         if (amount <= 0 || amount !== this.total) {
             throw new Error("Amount must match the total and be greater than 0");
@@ -45,7 +30,7 @@ export class Payment {
         }
         this.bookingFee = this.applyBookingFee();
         this.taxes = this.calculateTaxes();
-        this.total += this.bookingFee + this.taxes;
+        this.total = Number((this.total + this.bookingFee + this.taxes).toFixed(2));
         this.paymentMethod = paymentMethod;
         this.status = PaymentStatus.COMPLETE;
     }
@@ -80,7 +65,7 @@ export class Payment {
 
     calculateTaxes(): number {
         const taxRate = 0.05;
-        this.taxes = this.total * taxRate;
+        this.taxes = Number((this.total * taxRate).toFixed(2));
         return this.taxes;
     }
 

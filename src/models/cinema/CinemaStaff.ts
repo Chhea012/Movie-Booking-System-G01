@@ -1,7 +1,6 @@
 import { Person } from "../user/Person";
 import { Cinema } from "./Cinema";
 import { Ticket } from "../booking/Ticket";
-import { User } from "../user/User";
 
 export class CinemaStaff extends Person {
     constructor(
@@ -9,9 +8,12 @@ export class CinemaStaff extends Person {
         private cinema: Cinema,
         name: string,
         email: string,
-        phone: string,
+        phone: string
     ) {
         super(name, email, phone);
+        if (!idCinemaStaff || !cinema) {
+            throw new Error("Staff ID and cinema are required");
+        }
     }
 
     updateStaffNumber(staffNumber: string): void {
@@ -38,8 +40,7 @@ export class CinemaStaff extends Person {
         if (parts.length < 3) {
             return false;
         }
-        const ticketId = parts[1];
-        return !!ticketId;
+        return true;
     }
 
     getStaffId(): number {
@@ -60,6 +61,4 @@ export class CinemaStaff extends Person {
         }
         this.cinema = cinema;
     }
-
-    
 }

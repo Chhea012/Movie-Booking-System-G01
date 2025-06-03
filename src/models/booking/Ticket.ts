@@ -8,36 +8,45 @@ export class Ticket {
         private issueDate: string,
         private seat: Seat,
         private booking?: Booking
-    ) {}
+    ) {
+        if (!ticketId || !qrCode || !issueDate || !seat) {
+            throw new Error("Ticket ID, QR code, issue date, and seat are required");
+        }
+    }
 
-    // Update ticket price by updating the seat's price
     updatePrice(price: number): void {
+        if (price < 0) {
+            throw new Error("Price must be non-negative");
+        }
         this.seat.updateDetails(
             this.seat.getSeatId(),
             this.seat.getRow(),
             this.seat.getSeatNum(),
-            this.seat.getZipZone(), // Pass ZipZone directly
+            this.seat.getZipZone(),
             price
         );
     }
 
-    // Get seat
     getSeat(): Seat {
         return this.seat;
     }
 
-    // Get booking
     getBooking(): Booking | null {
         return this.booking || null;
     }
 
-    // Update issue date
     updateIssueDate(issueDate: string): void {
+        if (!issueDate || isNaN(new Date(issueDate).getTime())) {
+            throw new Error("Invalid issue date");
+        }
         this.issueDate = issueDate;
     }
 
-    // Generate QR code
     generateQRCode(): string {
         return `QR-${this.ticketId}-${new Date().toISOString()}`;
+    }
+
+    getTicketId(): string {
+        return this.ticketId;
     }
 }

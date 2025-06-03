@@ -13,22 +13,29 @@ export class Seat {
         private zipZone: ZipZone,
         private price: string,
         private movieRoom?: MovieRoom
-    ) {}
+    ) {
+        if (!seatId || !row || !seatNum || !zipZone || !price) {
+            throw new Error("All seat details are required");
+        }
+        if (isNaN(parseFloat(price)) || parseFloat(price) < 0) {
+            throw new Error("Price must be a valid non-negative number");
+        }
+    }
 
-    // Get the movie associated with the seat's showtime
     getMovie(): Movie | null {
         if (!this.movieRoom) return null;
         const showtimes = this.movieRoom.getShowtimes() || [];
-        return showtimes.length > 0 ? showtimes[0].getMovie() : null; // Assumes ShowTime has getMovie()
+        return showtimes.length > 0 ? showtimes[0].getMovie() : null;
     }
 
-    // Get the movie room
     getMovieRoom(): MovieRoom | null {
         return this.movieRoom || null;
     }
 
-    // Update seat details
     updateDetails(seatId: string, rowNum: string, seatNum: string, zipZone: ZipZone, price: number): void {
+        if (!seatId || !rowNum || !seatNum || !zipZone || isNaN(price) || price < 0) {
+            throw new Error("All seat details and valid price are required");
+        }
         this.seatId = seatId;
         this.row = rowNum;
         this.seatNum = seatNum;
@@ -36,33 +43,43 @@ export class Seat {
         this.price = price.toString();
     }
 
-    // Get seat ID
     getSeatId(): string {
         return this.seatId;
     }
 
-    // Get seat status
     getStatus(): SeatStatus {
         return this.status;
     }
 
-    // Set movie room
+    setStatus(status: SeatStatus): void {
+        // For a string enum, Object.keys gives us the keys (e.g., "AVAILABLE", "BOOKED", "RESERVED")
+        const validStatuses = Object.keys(SeatStatus).map(
+            key => SeatStatus[key as keyof typeof SeatStatus]
+        ) as SeatStatus[];
+
+        if (!validStatuses.includes(status)) {
+            throw new Error("Invalid seat status");
+        }
+        this.status = status;
+    }
+
     setMovieRoom(movieRoom: MovieRoom): void {
         this.movieRoom = movieRoom;
     }
 
-    // Get row
     getRow(): string {
         return this.row;
     }
 
-    // Get seat number
     getSeatNum(): string {
         return this.seatNum;
     }
 
-    // Get zip zone
     getZipZone(): ZipZone {
         return this.zipZone;
+    }
+
+    getPrice(): string {
+        return this.price;
     }
 }
