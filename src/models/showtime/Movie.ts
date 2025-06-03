@@ -2,17 +2,26 @@ import { Review } from "../review/Review";
 import { ShowTime } from "./ShowTime";
 
 export class Movie {
+    private showTimes: ShowTime[] = [];
+
     constructor(
         private idMovie: string,
         private title: string,
         private genre: string,
-        private review: Review[] = [],
+        private reviews: Review[] = [],
         private description: string,
         private duration: string,
-        private releaseDate: string,
-        private showTime: ShowTime[] = []
-    ){}
-    updateDetails(idMovie: string,title: string,genre: string,description: string,duration: string,releaseDate: string): void {
+        private releaseDate: string
+    ) {
+        if (!idMovie || !title || !genre || !description || !duration || !releaseDate) {
+            throw new Error("All movie details are required");
+        }
+    }
+
+    updateDetails(idMovie: string, title: string, genre: string, description: string, duration: string, releaseDate: string): void {
+        if (!idMovie || !title || !genre || !description || !duration || !releaseDate) {
+            throw new Error("All movie details are required");
+        }
         this.idMovie = idMovie;
         this.title = title;
         this.genre = genre;
@@ -22,30 +31,49 @@ export class Movie {
     }
 
     getShowTimes(): ShowTime[] {
-        return this.showTime;
+        return [...this.showTimes];
     }
 
-    getReviews(): Review[] {    
-        return this.review;
+    addShowTime(showtime: ShowTime): void {
+        if (!showtime) {
+            throw new Error("Showtime is required");
+        }
+        this.showTimes.push(showtime);
     }
-    // added method to get movie title
+
+    getReviews(): Review[] {
+        return [...this.reviews];
+    }
+
     getTitle(): string {
-        return this.title;  
+        return this.title;
     }
+
     getAverageRating(): number {
-        if (this.review.length === 0) return 0;
-        const totalRating = this.review.reduce((sum, review) => sum + parseFloat(review.getRating()), 0);
-        return totalRating / this.review.length;
-    }   
+        if (this.reviews.length === 0) return 0;
+        const totalRating = this.reviews.reduce((sum, review) => sum + parseFloat(review.getRating()), 0);
+        return Number((totalRating / this.reviews.length).toFixed(1));
+    }
 
     addReview(review: Review): void {
-        this.review.push(review);
+        if (!review) {
+            throw new Error("Review is required");
+        }
+        this.reviews.push(review);
     }
 
     filterMovieByGenre(genre: string): Movie[] {
-        return [this].filter(movie => movie.matchesGenre(genre));
+        if (!genre) {
+            throw new Error("Genre is required");
+        }
+        return this.matchesGenre(genre) ? [this] : [];
     }
+
     matchesGenre(genre: string): boolean {
         return this.genre.toLowerCase() === genre.toLowerCase();
+    }
+
+    getId(): string {
+        return this.idMovie;
     }
 }

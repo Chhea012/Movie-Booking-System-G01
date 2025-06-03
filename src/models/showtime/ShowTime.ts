@@ -4,20 +4,21 @@ import { Seat } from "../booking/Seat";
 import { ZipZone } from "../enum/ZipZone";
 
 export class ShowTime {
-    private showtimeId: string;
-
     constructor(
-        showtimeId: string,
+        private showtimeId: string,
         private startTime: string,
         private endTime: string,
         private price: number,
         private movieRoom: MovieRoom,
-        private movie: Movie,
+        private movie: Movie
     ) {
-        this.showtimeId = showtimeId;
+        this.validateTimes(startTime, endTime);
+        if (price < 0) {
+            throw new Error("Price must be non-negative");
+        }
     }
 
-    updateDetails(showtimeId: string, startTime: string, endTime: string, price: number): void {
+    private validateTimes(startTime: string, endTime: string): void {
         const start = new Date(startTime);
         const end = new Date(endTime);
         if (isNaN(start.getTime()) || isNaN(end.getTime())) {
@@ -26,10 +27,13 @@ export class ShowTime {
         if (start >= end) {
             throw new Error("Start time must be before end time");
         }
+    }
+
+    updateDetails(showtimeId: string, startTime: string, endTime: string, price: number): void {
+        this.validateTimes(startTime, endTime);
         if (price < 0) {
             throw new Error("Price must be non-negative");
         }
-
         this.showtimeId = showtimeId;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -100,8 +104,12 @@ export class ShowTime {
     hasSeatsAvailable(): boolean {
         return this.getAvailableSeats().length > 0;
     }
-// Add methods to get start and end times
+
     getStartTime(): string {
         return this.startTime;
+    }
+
+    getEndTime(): string {
+        return this.endTime;
     }
 }
