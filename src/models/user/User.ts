@@ -5,6 +5,7 @@ import { SeatStatus } from "../enum/SeatStatus";
 import { Review } from "../review/Review";
 import { ShowTime } from "../showtime/ShowTime";
 import { Person } from "./Person";
+import { Payment } from "../booking/Payment";
 
 const users: User[] = [];
 export class User extends Person {
@@ -57,7 +58,6 @@ export class User extends Person {
         console.log(`User "${user.getName()}" registered successfully.`);
     }
 
-    //login
     public static login(email: string, password: string): User {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -93,5 +93,58 @@ export class User extends Person {
     public getpassword(): string {
         return this.password;
     }
-}
 
+    //createBooking method
+    public createBooking(showtime: ShowTime, seats: Seat[], paymentMethod: string): Booking {
+        if (!showtime || !showtime.hasSeatsAvailable()) {
+            throw new Error("Invalid showtime or no seats available.");
+        }
+
+        const selectedSeats = seats.filter(seat => showtime.isSeatAvailable(seat));
+        if (selectedSeats.length !== seats.length) {
+            throw new Error("One or more selected seats are not available.");
+        }
+
+        const totalAmount = seats.reduce((sum, seat) => sum + showtime.calculatePrice(seat), 0);
+        
+        const bookingId = `BOOK-${Date.now()}`;
+        const bookingHistory = new BookingHistory(`HIST-${bookingId}`, this.userId);
+        const booking = new Booking(
+            bookingId,
+            this.userId,
+            showtime.getShowtimeId(),
+            selectedSeats,
+            [],
+            null, 
+            bookingHistory
+        );
+
+        const payment = new Payment(
+            Date.now(), 
+            booking, 
+            totalAmount
+        );
+        payment.processPayment(totalAmount, paymentMethod);
+        booking.setPayment(payment);
+
+        this.booking.push(booking);
+        bookingHistory.addBooking(booking);
+
+        selectedSeats.forEach(seat => {
+            seat.setMovieRoom(showtime.getMovieRoom());
+            const ticket = booking.generateTicket(seat);
+            bookingHistory.addEntry(`Ticket ${ticket.generateQRCode()} created for seat ${seat.getSeatId()}`);
+        });
+
+        booking.confirmBooking();
+        return booking;
+    }
+
+    public cancelBooking(bookingId: string): void {
+        const booking = this.booking.find(b => b.getId() === bookingId);
+        if (!booking) {
+            throw new Error(`Booking with ID ${bookingId} not found.`);
+        }
+        booking.cancelBooking();
+    }
+}

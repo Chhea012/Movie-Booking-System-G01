@@ -49,4 +49,7 @@ export class Cinema {
     getMovieRooms(): MovieRoom[] {
         return [...this.movieRooms];
     }
+    getaddress(): string{
+        return this.address
+    }
 }
