@@ -8,31 +8,51 @@ export class Notifications {
         private message: string,
         private type: string,
         private sentAt: Date,
-        private user?: User // Optional user field to associate with the notification
-    ){}
+        private user?: User
+    ) {
+        if (!idNotification || !type || !sentAt) {
+            throw new Error("Notification ID, type, and sent date are required");
+        }
+    }
 
-    sendBookingConfirmation(user:User, booking:Booking): void{
+    sendBookingConfirmation(user: User, booking: Booking): void {
+        if (!user || !booking) {
+            throw new Error("User and booking are required");
+        }
         this.message = `Booking confirmed for ${booking.getId()}`;
         this.type = "Booking Confirmation";
-        this.user = user; // Set the user for this notification
-        
+        this.user = user;
+        this.sentAt = new Date();
+        console.log(`${this.type}: ${this.message} for user ${user.getUserId()} at ${this.sentAt}`);
     }
 
     sendCancellationNotice(user: User, booking: Booking): void {
+        if (!user || !booking) {
+            throw new Error("User and booking are required");
+        }
         this.message = `Booking ${booking.getId()} has been cancelled`;
         this.type = "Cancellation Notice";
         this.user = user;
-        console.log(`${this.type}: ${this.message} for user ${user.getuserId()} at ${this.sentAt}`);
+        this.sentAt = new Date();
+        console.log(`${this.type}: ${this.message} for user ${user.getUserId()} at ${this.sentAt}`);
     }
 
     sendShowtimeReminder(user: User, showtime: ShowTime): void {
+        if (!user || !showtime) {
+            throw new Error("User and showtime are required");
+        }
         this.message = `Reminder: Showtime for ${showtime.getMovie().getTitle()} at ${showtime.getStartTime()}`;
         this.type = "Showtime Reminder";
         this.user = user;
-        console.log(`${this.type}: ${this.message} for user ${user.getuserId()} at ${this.sentAt}`);
+        this.sentAt = new Date();
+        console.log(`${this.type}: ${this.message} for user ${user.getUserId()} at ${this.sentAt}`);
     }
 
     getUser(): User | undefined {
         return this.user;
     }
- }
+
+    getMessage(): string {
+        return this.message;
+    }
+}

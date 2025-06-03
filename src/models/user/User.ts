@@ -9,16 +9,19 @@ import { Payment } from "../booking/Payment";
 
 const users: User[] = [];
 export class User extends Person {
+    private bookingHistory: BookingHistory;
+    
     constructor(
         name: string,
         email: string,
         phone: string,
         private userId: string,
         private password: string,
-        private booking: Booking[] = [],
-        private review: Review[] = []
+        private bookings: Booking[] = [],
+        private reviews: Review[] = []
     ) {
         super(name, email, phone);
+        this.bookingHistory = new BookingHistory(`HIST-${userId}`, userId);
     }
 
     public static register(user: User): void {
@@ -69,7 +72,7 @@ export class User extends Person {
             throw new Error("Password must be at least 8 characters long.");
         }
 
-        const user = User.getAllUsers().find(u => u.getEmail() === email);
+        const user = users.find(u => u.getEmail() === email);
         if (!user) {
             throw new Error(`User with email "${email}" not found.`);
         }
@@ -83,18 +86,21 @@ export class User extends Person {
     }
 
     public static getAllUsers(): User[] {
-        return users;
+        return [...users];
     }
 
-    public getuserId(): string {
+    public getUserId(): string {
         return this.userId;
     }
 
-    public getpassword(): string {
+    public getPassword(): string {
         return this.password;
     }
 
-    //createBooking method
+    public getBookingHistory(): BookingHistory {
+        return this.bookingHistory;
+    }
+
     public createBooking(showtime: ShowTime, seats: Seat[], paymentMethod: string): Booking {
         if (!showtime || !showtime.hasSeatsAvailable()) {
             throw new Error("Invalid showtime or no seats available.");
@@ -108,32 +114,32 @@ export class User extends Person {
         const totalAmount = seats.reduce((sum, seat) => sum + showtime.calculatePrice(seat), 0);
         
         const bookingId = `BOOK-${Date.now()}`;
-        const bookingHistory = new BookingHistory(`HIST-${bookingId}`, this.userId);
         const booking = new Booking(
             bookingId,
             this.userId,
             showtime.getShowtimeId(),
             selectedSeats,
             [],
-            null, 
-            bookingHistory
+            null,
+            this.bookingHistory
         );
 
         const payment = new Payment(
-            Date.now(), 
-            booking, 
+            Date.now(),
+            booking,
             totalAmount
         );
         payment.processPayment(totalAmount, paymentMethod);
         booking.setPayment(payment);
 
-        this.booking.push(booking);
-        bookingHistory.addBooking(booking);
+        this.bookings.push(booking);
+        this.bookingHistory.addBooking(booking);
 
         selectedSeats.forEach(seat => {
             seat.setMovieRoom(showtime.getMovieRoom());
+            seat.setStatus(SeatStatus.BOOKED);
             const ticket = booking.generateTicket(seat);
-            bookingHistory.addEntry(`Ticket ${ticket.generateQRCode()} created for seat ${seat.getSeatId()}`);
+            this.bookingHistory.addEntry(`Ticket ${ticket.generateQRCode()} created for seat ${seat.getSeatId()}`);
         });
 
         booking.confirmBooking();
@@ -141,10 +147,23 @@ export class User extends Person {
     }
 
     public cancelBooking(bookingId: string): void {
-        const booking = this.booking.find(b => b.getId() === bookingId);
+        const booking = this.bookings.find(b => b.getId() === bookingId);
         if (!booking) {
             throw new Error(`Booking with ID ${bookingId} not found.`);
         }
         booking.cancelBooking();
+        this.bookingHistory.addEntry(`Booking ${bookingId} cancelled on ${new Date()}`);
+    }
+
+    public addReview(review: Review): void {
+        if (!review) {
+            throw new Error("Review is required");
+        }
+        this.reviews.push(review);
+        this.bookingHistory.addEntry(`Review ${review.getReviewId()} added on ${new Date()}`);
+    }
+
+    public getReviews(): Review[] {
+        return [...this.reviews];
     }
 }

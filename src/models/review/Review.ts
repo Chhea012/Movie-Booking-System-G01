@@ -2,50 +2,64 @@ import { Movie } from "../showtime/Movie";
 import { User } from "../user/User";
 
 export class Review {
-    private creationDate: string = new Date().toISOString(); // Automatically set on creation
-    private approved: boolean = false; // Default to unapproved
+    private creationDate: string = new Date().toISOString();
+    private approved: boolean = false;
+
     constructor(
-    private  reviewId : number,
-    private showTime : string,
-    private rating : string,
-    private comment : string,
-    private user : User,
-    private movie : Movie
-    ){}
-    //create method updateReview
+        private reviewId: number,
+        private showTime: string,
+        private rating: string,
+        private comment: string,
+        private user: User,
+        private movie: Movie
+    ) {
+        if (!reviewId || !showTime || !rating || !comment || !user || !movie) {
+            throw new Error("All review details are required");
+        }
+        if (isNaN(parseFloat(rating)) || parseFloat(rating) < 0 || parseFloat(rating) > 5) {
+            throw new Error("Rating must be a number between 0 and 5");
+        }
+    }
+
     updateReview(rating: string, comment: string): void {
+        if (!rating || !comment) {
+            throw new Error("Rating and comment are required");
+        }
+        if (isNaN(parseFloat(rating)) || parseFloat(rating) < 0 || parseFloat(rating) > 5) {
+            throw new Error("Rating must be a number between 0 and 5");
+        }
         this.rating = rating;
         this.comment = comment;
     }
-    //create method getUser
+
     getUser(): User {
         return this.user;
     }
-    //create method getMovie
+
     getMovie(): Movie {
         return this.movie;
     }
-    // Additional Methods
+
     getReviewId(): number {
         return this.reviewId;
     }
-    //create method getRating
+
     getRating(): string {
         return this.rating;
     }
-    //create method getComment
+
     getComment(): string {
         return this.comment;
     }
-    //create method isApproved
+
     isApproved(): boolean {
         return this.approved;
     }
-    //create method setApprovalStatus
+
     setApprovalStatus(approved: boolean): void {
         this.approved = approved;
     }
-    //create method getCreationDate
+
     getCreationDate(): string {
         return this.creationDate;
     }
