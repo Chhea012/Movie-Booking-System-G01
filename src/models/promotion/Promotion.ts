@@ -12,11 +12,6 @@ export class Promotion {
         if (typeof discount !== "number" || discount < 0 || discount > 100) {
             throw new Error("Discount must be a number between 0 and 100.");
         }
-        this.promoteId = promoteId;
-        this.code = code;
-        this.discount = discount;
-        this.description = description;
-        this.isActive = isActive;
     }
 
     applyDiscount(amount: number): number {
@@ -24,7 +19,7 @@ export class Promotion {
             return amount;
         }
         const discountAmount = (amount * this.discount) / 100;
-        return Number((amount - discountAmount).toFixed(2)); 
+        return Number((amount - discountAmount).toFixed(2));
     }
 
     updateDiscount(

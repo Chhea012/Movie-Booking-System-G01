@@ -2,13 +2,19 @@ import { Movie } from "./Movie";
 import { ShowTime } from "./ShowTime";
 
 export class MovieManager {
-
-    constructor(private movies: Movie[] = []){}
+    constructor(private movies: Movie[] = []) {}
 
     addMovie(movie: Movie): void {
+        if (!movie) {
+            throw new Error("Movie is required");
+        }
         this.movies.push(movie);
     }
+
     filterMoviesByGenre(genre: string): Movie[] {
+        if (!genre) {
+            throw new Error("Genre is required");
+        }
         return this.movies.filter(movie => movie.matchesGenre(genre));
     }
 
@@ -62,4 +68,9 @@ export class MovieManager {
 
     return result;
   }
+    
+
+    getMovies(): Movie[] {
+        return [...this.movies];
+    }
 }

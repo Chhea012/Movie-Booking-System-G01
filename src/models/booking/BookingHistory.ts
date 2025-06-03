@@ -1,13 +1,18 @@
 import { Booking } from "./Booking";
-import { User } from "../user/User"; 
+import { User } from "../user/User";
 
 export class BookingHistory {
+    private entries: string[] = [];
+
     constructor(
-        private historyId: string, 
-        private userId: string,   
-        private bookings: Booking[] = [],
-        private entries: string[] = []
-    ) {}
+        private historyId: string,
+        private userId: string,
+        private bookings: Booking[] = []
+    ) {
+        if (!historyId || !userId) {
+            throw new Error("History ID and user ID are required");
+        }
+    }
 
     getHistoryId(): string {
         return this.historyId;
@@ -18,11 +23,15 @@ export class BookingHistory {
     }
 
     getBookings(): Booking[] {
-        return this.bookings;
+        return [...this.bookings];
     }
 
     getUser(): User {
-        throw new Error("getUser() not implemented yet. Requires User class integration.");
+        const user = User.getAllUsers().find(u => u.getUserId() === this.userId);
+        if (!user) {
+            throw new Error(`User with ID ${this.userId} not found`);
+        }
+        return user;
     }
 
     addBooking(booking: Booking): void {
@@ -34,23 +43,32 @@ export class BookingHistory {
 
     getUpcomingBookings(): Booking[] {
         const now = new Date();
-        return this.bookings.filter(booking => booking.getDate() > now);
+        return this.bookings.filter(booking => {
+            const showtimeStart = new Date(booking.getShowtime().getStartTime());
+            return showtimeStart > now && booking.getStatus() !== "CANCELLED";
+        });
     }
 
     getPastBookings(): Booking[] {
         const now = new Date();
-        return this.bookings.filter(booking => booking.getDate() <= now);
+        return this.bookings.filter(booking => {
+            const showtimeStart = new Date(booking.getShowtime().getStartTime());
+            return showtimeStart <= now || booking.getStatus() === "CANCELLED";
+        });
     }
 
     updateBookingStatus(bookingId: string, status: string): void {
+        if (!bookingId || !status) {
+            throw new Error("Booking ID and status are required");
+        }
         const booking = this.bookings.find(b => b.getId() === bookingId);
-        if (booking) {
-            booking.setStatus(status); 
-        } else {
+        if (!booking) {
             throw new Error(`Booking with ID ${bookingId} not found`);
         }
+        booking.setStatus(status);
+        this.addEntry(`Booking ${bookingId} status updated to ${status} on ${new Date()}`);
     }
-    // New method to add a history entry
+
     addEntry(entry: string): void {
         if (!entry) {
             throw new Error("Entry cannot be empty");
@@ -59,6 +77,6 @@ export class BookingHistory {
     }
 
     getEntries(): string[] {
-        return this.entries;
+        return [...this.entries];
     }
 }

@@ -4,53 +4,62 @@ import { ShowTime } from "./ShowTime";
 import { SeatStatus } from "../enum/SeatStatus";
 
 export class MovieRoom {
+    private showtimes: ShowTime[] = [];
+
     constructor(
         private id: string,
         private name: string,
         private cinema: Cinema,
-        private seats: Seat[] = [],
-        private showtime: ShowTime[] = []
+        private seats: Seat[] = []
     ) {}
 
-    // Add a seat to the room
     addSeat(seat: Seat): void {
+        if (!seat) {
+            throw new Error("Seat is required");
+        }
         this.seats.push(seat);
-        seat.setMovieRoom(this); // Set bidirectional relationship
+        seat.setMovieRoom(this);
     }
 
-    // Remove a seat by ID
     removeSeat(seatId: string): void {
+        if (!seatId) {
+            throw new Error("Seat ID is required");
+        }
         this.seats = this.seats.filter(seat => seat.getSeatId() !== seatId);
     }
 
-    // Get all seats
     getSeats(): Seat[] {
         return [...this.seats];
     }
 
-    // Get available seats
     getAvailableSeats(): Seat[] {
         return this.seats.filter(seat => seat.getStatus() === SeatStatus.AVAILABLE);
     }
 
-    // Update room details
     updateDetails(roomId: string, name: string): void {
+        if (!roomId || !name) {
+            throw new Error("Room ID and name are required");
+        }
         this.id = roomId;
         this.name = name;
     }
 
-    // Get cinema
     getCinema(): Cinema {
         return this.cinema;
     }
 
-    // View seat availability
     viewSeatAvailability(): Seat[] {
         return this.getAvailableSeats();
     }
 
-    // Get showtimes
     getShowtimes(): ShowTime[] {
-        return [...this.showtime];
+        return [...this.showtimes];
+    }
+
+    addShowtime(showtime: ShowTime): void {
+        if (!showtime) {
+            throw new Error("Showtime is required");
+        }
+        this.showtimes.push(showtime);
     }
 }
