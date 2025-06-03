@@ -1,6 +1,4 @@
 import { Booking } from "./models/booking/Booking";
-import { Cancellation } from "./models/booking/Cancellation";
-import { Payment } from "./models/booking/Payment";
 import { Promotion } from "./models/promotion/Promotion";
 import { User } from "./models/user/User";
 

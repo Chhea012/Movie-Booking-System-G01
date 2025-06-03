@@ -21,7 +21,7 @@ export class Booking {
 
     ){
         this.status = "PENDING";
-        this.date = new Date();
+        this.date = new Date("2025-06-01T23:00:00+07:00");
     }
     getId(): string {
         return this.id;

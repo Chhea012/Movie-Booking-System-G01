@@ -44,7 +44,7 @@ export class BookingHistory {
     updateBookingStatus(bookingId: string, status: string): void {
         const booking = this.bookings.find(b => b.getId() === bookingId);
         if (booking) {
-            booking.setStatus(status); // Assuming Booking has setStatus
+            booking.setStatus(status); 
         } else {
             throw new Error(`Booking with ID ${bookingId} not found`);
         }
