@@ -43,12 +43,18 @@ export class BookingHistory {
 
     getUpcomingBookings(): Booking[] {
         const now = new Date();
-        return this.bookings.filter(booking => booking.getDate() > now);
+        return this.bookings.filter(booking => {
+            const showtimeStart = new Date(booking.getShowtime().getStartTime());
+            return showtimeStart > now && booking.getStatus() !== "CANCELLED";
+        });
     }
 
     getPastBookings(): Booking[] {
         const now = new Date();
-        return this.bookings.filter(booking => booking.getDate() <= now);
+        return this.bookings.filter(booking => {
+            const showtimeStart = new Date(booking.getShowtime().getStartTime());
+            return showtimeStart <= now || booking.getStatus() === "CANCELLED";
+        });
     }
 
     updateBookingStatus(bookingId: string, status: string): void {

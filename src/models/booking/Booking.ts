@@ -6,6 +6,7 @@ import { Payment } from "./Payment";
 import { Seat } from "./Seat";
 import { Ticket } from "./Ticket";
 import { SeatStatus } from "../enum/SeatStatus";
+import { ShowTime } from "../showtime/ShowTime";
 
 export class Booking {
     private status: string;
@@ -14,7 +15,7 @@ export class Booking {
     constructor(
         private id: string,
         private userId: string,
-        private showtimeId: string,
+        private showtime: ShowTime, // Changed from showtimeId: string to showtime: ShowTime
         private seats: Seat[],
         private tickets: Ticket[],
         private payment: Payment | null,
@@ -22,8 +23,8 @@ export class Booking {
         private cancellation?: Cancellation,
         private promotion?: Promotion
     ) {
-        if (!id || !userId || !showtimeId || !seats || !bookingHistory) {
-            throw new Error("Booking ID, user ID, showtime ID, seats, and booking history are required");
+        if (!id || !userId || !showtime || !seats || !bookingHistory) {
+            throw new Error("Booking ID, user ID, showtime, seats, and booking history are required");
         }
         this.status = BookingStatus.PENDING;
         this.date = new Date();
@@ -37,8 +38,8 @@ export class Booking {
         return this.userId;
     }
 
-    getShowtime(): string {
-        return this.showtimeId;
+    getShowtime(): ShowTime { // Updated return type to ShowTime
+        return this.showtime;
     }
 
     getSeats(): Seat[] {
@@ -148,4 +149,4 @@ export class Booking {
         const removedTicket = this.tickets.splice(ticketIndex, 1)[0];
         this.bookingHistory.addEntry(`Ticket ${ticketId} removed from booking on ${new Date()}`);
     }
-}   
+}

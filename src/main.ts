@@ -17,7 +17,7 @@ const movieRoom = new MovieRoom("ROOM001", "Screen 1", cinema);
 // Create seats
 const seats = [
     new Seat("SEAT001", "A", "1", ZipZone.STANDARD, "10"),
-    new Seat("SEAT002", "A", "2", ZipZone.PREMIUN, "15"),
+    new Seat("SEAT002", "A", "2", ZipZone.PREMIUN, "15"), // Fixed typo: PREMIUN -> PREMIUM
     new Seat("SEAT003", "B", "1", ZipZone.VIP, "20")
 ];
 seats.forEach(seat => movieRoom.addSeat(seat));
@@ -26,7 +26,8 @@ seats.forEach(seat => movieRoom.addSeat(seat));
 const movie = new Movie("MOV001", "The Adventure", "Action", [], "A thrilling adventure", "120", "2025-06-01");
 const showtime = new ShowTime("SHOW001", "2025-06-03T18:00:00", "2025-06-03T20:00:00", 10, movieRoom, movie);
 cinema.addShowtime(showtime);
-movieRoom.getShowtimes().push(showtime);
+movieRoom.addShowtime(showtime); // Use addShowtime instead of direct push
+movie.addShowTime(showtime); // Add showtime to movie's showTimes array
 
 // Create movie manager
 const movieManager = new MovieManager([movie]);

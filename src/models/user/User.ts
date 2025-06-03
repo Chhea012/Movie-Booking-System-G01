@@ -117,7 +117,7 @@ export class User extends Person {
         const booking = new Booking(
             bookingId,
             this.userId,
-            showtime.getShowtimeId(),
+            showtime, // Pass the ShowTime object instead of showtimeId
             selectedSeats,
             [],
             null,
