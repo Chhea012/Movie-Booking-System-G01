@@ -52,4 +52,8 @@ export class Cinema {
     getaddress(): string{
         return this.address
     }
+    getCinemaId(): string {
+        return this.cinemaId;
+    }
+    
 }
