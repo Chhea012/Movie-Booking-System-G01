@@ -139,12 +139,17 @@ export class User extends Person {
         booking.confirmBooking();
         return booking;
     }
-
     public cancelBooking(bookingId: string): void {
         const booking = this.booking.find(b => b.getId() === bookingId);
         if (!booking) {
             throw new Error(`Booking with ID ${bookingId} not found.`);
         }
         booking.cancelBooking();
+    }
+    addBooking(booking: Booking): void {
+        this.booking.push(booking);
+    }
+    getBookings(): Booking[] {
+        return this.booking;
     }
 }

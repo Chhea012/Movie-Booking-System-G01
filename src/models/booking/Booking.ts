@@ -78,6 +78,9 @@ export class Booking {
     getDate(): Date {
         return this.date;
     }
+    setDate(date: Date): void {
+        this.date = date;
+    }
 
     confirmBooking(): void {
         if (this.tickets.length > 0 && this.payment && this.status === BookinStatus.PENDING) {

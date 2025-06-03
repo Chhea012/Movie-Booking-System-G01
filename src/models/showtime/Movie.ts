@@ -24,6 +24,9 @@ export class Movie {
     getShowTimes(): ShowTime[] {
         return this.showTime;
     }
+    addShowTime(showtime: ShowTime): void {
+        this.showTime.push(showtime);
+    }
 
     getReviews(): Review[] {    
         return this.review;

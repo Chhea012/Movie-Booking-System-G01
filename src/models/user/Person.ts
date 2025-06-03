@@ -15,13 +15,10 @@ export abstract class Person{
         this.email = email;
         this.phone = phone;
     }
-   
-    
-
     public getName(): string{
         return this.name
     }
-    public getEmail():string{
+    public getEmail():string{   
         return this.email
     }
     public getPhone(): string{
