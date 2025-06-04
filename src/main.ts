@@ -9,6 +9,8 @@ import { MovieManager } from "./models/showtime/MovieManager";
 import { ZipZone } from "./models/enum/ZipZone";
 import { Review } from "./models/review/Review";
 import { Notifications } from "./models/notification/Notifications";
+import { Payment } from "./models/booking/Payment";
+import { PaymentStatus } from "./models/enum/PaymentStatus";
 
 // Initialize data
 const cinema = new Cinema("CIN001", "City Cinema", "123 Main St");
@@ -35,8 +37,10 @@ const movieManager = new MovieManager([movie]);
 // Create users
 const soda = new User("Soda", "soda@gmail.com", "+855978049375", "Soda12", "soda1225");
 const giyu = new User("Giyu", "giyu@gmail.com", "+85599861664", "Giyu13", "giyu1225");
+const Gigi = new User("Gigi","gig@gmail.com","+855 9981323","gigi12","gigi1225");
 User.register(soda);
 User.register(giyu);
+User.register(Gigi);
 
 // Create cinema staff
 const staff = new CinemaStaff(1, cinema, "John Staff", "john@cinema.com", "+855123456789");
@@ -88,5 +92,169 @@ function demonstrateUserStories() {
     }
 }
 
-// Execute demonstration
+// Demonstrate Payment class tests
+function demonstratePaymentTests() {
+    console.log("\n=== Payment Class Tests ===");
+
+    // Setup: Create a booking for the tests
+    let booking;
+    try {
+        const selectedSeats = [seats[0], seats[1]]; // SEAT001 ($10), SEAT002 ($15)
+        booking = soda.createBooking(showtime, selectedSeats, "Credit Card");
+        console.log("Setup: Booking created for testing:", booking.getId());
+    } catch (error) {
+        console.error("Setup error: Failed to create booking:", (error as Error).message);
+        return;
+    }
+
+    // Test 1: Constructor
+    console.log("\n=== Test 1: Payment Constructor ===");
+    try {
+        const payment = new Payment(1, booking, 25); // Total = $10 + $15
+        console.log("Payment created successfully:");
+        console.log("Payment ID:", payment.getPaymentId());
+        console.log("Booking ID:", payment.getBooking().getId());
+        console.log("Total:", payment.getTotal());
+        console.log("Payment Method:", payment.getPaymentMethod());
+        console.log("Status:", payment.getStatus());
+        console.log("Booking Fee:", payment.getBookingFee());
+        console.log("Taxes:", payment.getTaxes());
+    } catch (error) {
+        console.error("Constructor error:", (error as Error).message);
+    }
+
+    // Test 2: Constructor with invalid inputs
+    console.log("\n=== Test 2: Payment Constructor with Invalid Inputs ===");
+    try {
+        const payment = new Payment(0, booking, 25); // Invalid paymentId
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for invalid paymentId:", (error as Error).message);
+    }
+    try {
+        const payment = new Payment(2, booking, -10); // Invalid total
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for invalid total:", (error as Error).message);
+    }
+    try {
+        const payment = new Payment(3, null as any, 25); // Invalid booking
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for missing booking:", (error as Error).message);
+    }
+
+    // Test 3: Process Payment
+    console.log("\n=== Test 3: Process Payment ===");
+    const payment = new Payment(4, booking, 25);
+    try {
+        payment.processPayment(25, "Credit Card");
+        console.log("Payment processed successfully:");
+        console.log("Status:", payment.getStatus());
+        console.log("Payment Method:", payment.getPaymentMethod());
+        console.log("Booking Fee:", payment.getBookingFee());
+        console.log("Taxes:", payment.getTaxes());
+        console.log("Updated Total:", payment.getTotal()); // 25 + 2 (fee) + 1.25 (tax) = 28.25
+    } catch (error) {
+        console.error("Process payment error:", (error as Error).message);
+    }
+
+    // Test 4: Process Payment with invalid inputs
+    console.log("\n=== Test 4: Process Payment with Invalid Inputs ===");
+    const payment2 = new Payment(5, booking, 25);
+    try {
+        payment2.processPayment(20, "Credit Card"); // Wrong amount
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for wrong amount:", (error as Error).message);
+    }
+    try {
+        payment2.processPayment(25, "PayPal"); // Invalid method
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for invalid payment method:", (error as Error).message);
+    }
+    try {
+        payment2.processPayment(25, "Credit Card");
+        payment2.processPayment(25, "Credit Card"); // Already processed
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for non-pending payment:", (error as Error).message);
+    }
+
+    // Test 5: Refund Payment
+    console.log("\n=== Test 5: Refund Payment ===");
+    const payment3 = new Payment(6, booking, 25);
+    try {
+        payment3.processPayment(25, "Debit Card");
+        // Mock booking status to CANCELLED
+        (booking as any).getStatus = () => "CANCELLED";
+        payment3.refundPayment();
+        console.log("Payment refunded successfully:");
+        console.log("Status:", payment3.getStatus());
+    } catch (error) {
+        console.error("Refund error:", (error as Error).message);
+    }
+
+    // Test 6: Refund Payment with invalid conditions
+    console.log("\n=== Test 6: Refund Payment with Invalid Conditions ===");
+    const payment4 = new Payment(7, booking, 25);
+    try {
+        payment4.refundPayment(); // Not processed
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for non-completed payment:", (error as Error).message);
+    }
+    try {
+        (booking as any).getStatus = () => "CONFIRMED"; // Not cancelled
+        const payment5 = new Payment(8, booking, 25);
+        payment5.processPayment(25, "Cash");
+        payment5.refundPayment();
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for non-cancelled booking:", (error as Error).message);
+    }
+
+    // Test 7: Update Status
+    console.log("\n=== Test 7: Update Status ===");
+    const payment6 = new Payment(9, booking, 25);
+    try {
+        payment6.updateStatus(PaymentStatus.COMPLETE);
+        console.log("Status updated to COMPLETE:", payment6.getStatus());
+        payment6.updateStatus(PaymentStatus.FAILED);
+        console.log("Status updated to FAILED:", payment6.getStatus());
+        payment6.updateStatus(PaymentStatus.CANCELLED);
+        console.log("Status updated to CANCELLED:", payment6.getStatus());
+        payment6.updateStatus(PaymentStatus.PPENDING);
+        console.log("Status updated to PPENDING:", payment6.getStatus());
+    } catch (error) {
+        console.error("Update status error:", (error as Error).message);
+    }
+
+    // Test 8: Update Status with invalid status
+    console.log("\n=== Test 8: Update Status with Invalid Status ===");
+    try {
+        payment6.updateStatus("INVALID" as any);
+        console.log("This should not print");
+    } catch (error) {
+        console.error("Expected error for invalid status:", (error as Error).message);
+    }
+
+    // Test 9: Apply Booking Fee and Calculate Taxes
+    console.log("\n=== Test 9: Apply Booking Fee and Calculate Taxes ===");
+    const payment7 = new Payment(10, booking, 25);
+    try {
+        const fee = payment7.applyBookingFee();
+        const taxes = payment7.calculateTaxes();
+        console.log("Booking Fee applied:", fee);
+        console.log("Taxes calculated:", taxes);
+        console.log("Stored Booking Fee:", payment7.getBookingFee());
+        console.log("Stored Taxes:", payment7.getTaxes());
+    } catch (error) {
+        console.error("Fee/Taxes error:", (error as Error).message);
+    }
+}
+
+// Execute demonstrations
 demonstrateUserStories();
+demonstratePaymentTests();

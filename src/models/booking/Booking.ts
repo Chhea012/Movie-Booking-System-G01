@@ -8,14 +8,14 @@ import { Ticket } from "./Ticket";
 import { SeatStatus } from "../enum/SeatStatus";
 import { ShowTime } from "../showtime/ShowTime";
 
+
 export class Booking {
     private status: string;
     private date: Date;
-
     constructor(
         private id: string,
         private userId: string,
-        private showtime: ShowTime, // Changed from showtimeId: string to showtime: ShowTime
+        private showtime: ShowTime, 
         private seats: Seat[],
         private tickets: Ticket[],
         private payment: Payment | null,
@@ -38,7 +38,7 @@ export class Booking {
         return this.userId;
     }
 
-    getShowtime(): ShowTime { // Updated return type to ShowTime
+    getShowtime(): ShowTime { 
         return this.showtime;
     }
 
