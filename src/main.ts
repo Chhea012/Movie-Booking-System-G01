@@ -9,6 +9,9 @@ import { MovieManager } from "./models/showtime/MovieManager";
 import { ZipZone } from "./models/enum/ZipZone";
 import { Review } from "./models/review/Review";
 import { Notifications } from "./models/notification/Notifications";
+import { Payment } from "./models/booking/Payment";
+import { PaymentStatus } from "./models/enum/PaymentStatus";
+import { Promotion } from "./models/promotion/Promotion";
 
 // Initialize data
 const cinema = new Cinema("CIN001", "City Cinema", "123 Main St");
@@ -17,17 +20,17 @@ const movieRoom = new MovieRoom("ROOM001", "Screen 1", cinema);
 // Create seats
 const seats = [
     new Seat("SEAT001", "A", "1", ZipZone.STANDARD, "10"),
-    new Seat("SEAT002", "A", "2", ZipZone.PREMIUN, "15"), // Fixed typo: PREMIUN -> PREMIUM
+    new Seat("SEAT002", "A", "2", ZipZone.PREMIUN, "15"),
     new Seat("SEAT003", "B", "1", ZipZone.VIP, "20")
 ];
 seats.forEach(seat => movieRoom.addSeat(seat));
 
 // Create movie and showtime
 const movie = new Movie("MOV001", "The Adventure", "Action", [], "A thrilling adventure", "120", "2025-06-01");
-const showtime = new ShowTime("SHOW001", "2025-06-03T18:00:00", "2025-06-03T20:00:00", 10, movieRoom, movie);
+const showtime = new ShowTime("SHOW001", "2025-06-04T18:00:00", "2025-06-04T20:00:00", 10, movieRoom, movie);
 cinema.addShowtime(showtime);
-movieRoom.addShowtime(showtime); // Use addShowtime instead of direct push
-movie.addShowTime(showtime); // Add showtime to movie's showTimes array
+movieRoom.addShowtime(showtime);
+movie.addShowTime(showtime);
 
 // Create movie manager
 const movieManager = new MovieManager([movie]);
@@ -35,61 +38,112 @@ const movieManager = new MovieManager([movie]);
 // Create users
 const soda = new User("Soda", "soda@gmail.com", "+855978049375", "Soda12", "soda1225");
 const giyu = new User("Giyu", "giyu@gmail.com", "+85599861664", "Giyu13", "giyu1225");
+const Gigi = new User("Gigi","gig@gmail.com","+855 9981323","gigi12","gigi1225");
 User.register(soda);
 User.register(giyu);
+User.register(Gigi);
 
 // Create cinema staff
 const staff = new CinemaStaff(1, cinema, "John Staff", "john@cinema.com", "+855123456789");
 cinema.addCinemaStaff(staff);
 
-// Demonstrate user stories
-function demonstrateUserStories() {
-    console.log("\n=== User Story 1: Browse and filter movies ===");
-    console.log("Movies by genre 'Action':", movieManager.filterMoviesByGenre("Action").map(m => m.getTitle()));
-    console.log("Showtimes for movie:", movie.getShowTimes().map(s => s.getStartTime()));
+// Create promotion
+const promotion = new Promotion(1, "SUMMER25", 10, "Summer discount", true);
 
-    console.log("\n=== User Story 2: View seat availability and choose seats ===");
-    console.log("Available seats:", movieRoom.getAvailableSeats().map(s => s.getSeatId()));
+// Demonstrate movie booking process
+function demonstrateMovieBookingProcess() {
+    console.log("\n🎬 Welcome to City Cinema Booking System 🎬");
+    console.log("=========================================");
 
-    console.log("\n=== User Story 3: Pay for booking and receive ticket ===");
+    console.log("\n1. Browsing Movies and Showtimes");
+    console.log("--------------------------------");
     try {
+        console.log("Available movies in genre 'Action':", movieManager.filterMoviesByGenre("Action").map(m => m.getTitle()).join(", "));
+        console.log("Showtimes for 'The Adventure':", movie.getShowTimes().map(s => new Date(s.getStartTime()).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })));
+    } catch (error) {
+        console.error("Error browsing movies:", (error as Error).message);
+    }
+
+    console.log("\n2. Checking Seat Availability");
+    console.log("-----------------------------");
+    try {
+        console.log("Available seats in Screen 1:", movieRoom.getAvailableSeats().map(s => `${s.getSeatId()} (${s.getZipZone()})`).join(", "));
+    } catch (error) {
+        console.error("Error checking seats:", (error as Error).message);
+    }
+
+    console.log("\n3. Booking Tickets with Promotion");
+    console.log("---------------------------------");
+    let booking;
+    try {
+        console.log(`User ${soda.getName()} is booking tickets...`);
         const selectedSeats = [seats[0], seats[1]];
-        const booking = soda.createBooking(showtime, selectedSeats, "Credit Card");
-        console.log("Booking created:", booking.getId());
-        console.log("Tickets:", booking.getTicket().map(t => t.generateQRCode()));
-        
+        booking = soda.createBooking(showtime, selectedSeats, "Credit Card");
+        console.log(`Booking successful! Booking ID: ${booking.getId()}`);
+        console.log("Tickets issued:", booking.getTicket().map(t => t.generateQRCode()).join(", "));
+
+        // Display payment details
+        const payment = booking.getPayment();
+        if (payment) {
+            console.log("Payment Summary:");
+            console.log(`- Subtotal: $${(payment.getTotal() - payment.getBookingFee() - payment.getTaxes()).toFixed(2)}`);
+            console.log(`- Booking Fee: $${payment.getBookingFee().toFixed(2)}`);
+            console.log(`- Taxes (5%): $${payment.getTaxes().toFixed(2)}`);
+            console.log(`- Total Paid: $${payment.getTotal().toFixed(2)}`);
+            console.log(`- Payment Method: ${payment.getPaymentMethod()}`);
+            console.log(`- Payment Status: ${payment.getStatus()}`);
+        }
+
         // Send notification
         const notification = new Notifications("NOTIF001", "", "Booking", new Date());
         notification.sendBookingConfirmation(soda, booking);
-        console.log("Notification sent:", notification.getMessage());
     } catch (error) {
-        console.error("Booking error:", (error as Error).message);
+        console.error("Booking failed:", (error as Error).message);
     }
 
-    console.log("\n=== User Story 4: View upcoming and past bookings ===");
-    console.log("Soda's upcoming bookings:", soda.getBookingHistory().getUpcomingBookings().map(b => b.getId()));
-    console.log("Soda's past bookings:", soda.getBookingHistory().getPastBookings().map(b => b.getId()));
-
-    console.log("\n=== User Story 5: Staff check QR code ===");
-    const ticket = soda.getBookingHistory().getBookings()[0]?.getTicket()[0];
-    if (ticket) {
-        console.log("QR Code valid:", staff.checkQRCode(ticket.generateQRCode()));
-    }
-
-    console.log("\n=== User Story 6: Rate and review movie ===");
+    console.log("\n4. Viewing Bookings");
+    console.log("-------------------");
     try {
-        const review = new Review(1, showtime.getShowtimeId(), "4.5", "Great movie!", soda, movie);
+        console.log(`${soda.getName()}'s upcoming bookings:`, soda.getBookingHistory().getUpcomingBookings().map(b => b.getId()).join(", ") || "None");
+        console.log(`${soda.getName()}'s past bookings:`, soda.getBookingHistory().getPastBookings().map(b => b.getId()).join(", ") || "None");
+    } catch (error) {
+        console.error("Error viewing bookings:", (error as Error).message);
+    }
+
+    console.log("\n5. Validating Ticket at Cinema");
+    console.log("-----------------------------");
+    try {
+        const ticket = booking?.getTicket()[0];
+        if (ticket) {
+            console.log(`Staff checking QR code: ${ticket.generateQRCode()}`);
+            console.log("Ticket validation:", staff.checkQRCode(ticket.generateQRCode()) ? "Valid" : "Invalid");
+        } else {
+            console.log("No ticket found for validation.");
+        }
+    } catch (error) {
+        console.error("Error validating ticket:", (error as Error).message);
+    }
+
+    console.log("\n6. Rating and Reviewing Movie");
+    console.log("-----------------------------");
+    try {
+        const review = new Review(1, showtime.getShowtimeId(), "4.5", "Great movie, action-packed!", soda, movie);
         soda.addReview(review);
         movie.addReview(review);
-        console.log("Review added:", review.getComment(), "Rating:", review.getRating());
-        console.log("Movie average rating:", movie.getAverageRating());
+        console.log(`${soda.getName()} submitted a review for 'The Adventure':`);
+        console.log(`- Comment: ${review.getComment()}`);
+        console.log(`- Rating: ${review.getRating()} / 5`);
+        console.log(`- Movie Average Rating: ${movie.getAverageRating()} / 5`);
     } catch (error) {
-        console.error("Review error:", (error as Error).message);
+        console.error("Error submitting review:", (error as Error).message);
     }
+
+    console.log("\n=========================================");
+    console.log("Thank you for using City Cinema Booking System! 🎬");
 }
 
 // Execute demonstration
-demonstrateUserStories();
+demonstrateMovieBookingProcess();
 
 
 console.log("Welcome to Cineplex Booking System");
