@@ -8,9 +8,10 @@ import { Person } from "./Person";
 import { Payment } from "../booking/Payment";
 
 const users: User[] = [];
+
 export class User extends Person {
     private bookingHistory: BookingHistory;
-    
+
     constructor(
         name: string,
         email: string,
@@ -90,6 +91,11 @@ export class User extends Person {
     }
 
     public getUserId(): string {
+        return this.userId;
+    }
+
+    // ✅ Added to fix the issue in main.ts
+    public getUsername(): string {
         return this.userId;
     }
 

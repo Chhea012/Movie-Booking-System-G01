@@ -7,13 +7,13 @@ export class Review {
 
     constructor(
         private reviewId: number,
-        private showTime: string,
+        private showtimeId: string, // Renamed showTime to showtimeId for clarity
         private rating: string,
         private comment: string,
         private user: User,
         private movie: Movie
     ) {
-        if (!reviewId || !showTime || !rating || !comment || !user || !movie) {
+        if (!reviewId || !showtimeId || !rating || !comment || !user || !movie) {
             throw new Error("All review details are required");
         }
         if (isNaN(parseFloat(rating)) || parseFloat(rating) < 0 || parseFloat(rating) > 5) {
@@ -50,6 +50,10 @@ export class Review {
 
     getComment(): string {
         return this.comment;
+    }
+
+    getShowtimeId(): string { // Added method to return showtimeId
+        return this.showtimeId;
     }
 
     isApproved(): boolean {

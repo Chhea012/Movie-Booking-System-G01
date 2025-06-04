@@ -1,5 +1,6 @@
+// Import statements remain unchanged
 import { User } from "./models/user/User";
-import { Movie } from "./models/showtime/Movie";
+import { Movie } from "./models/showtime/Movie"; 
 import { MovieRoom } from "./models/showtime/MovieRoom";
 import { ShowTime } from "./models/showtime/ShowTime";
 import { Seat } from "./models/booking/Seat";
@@ -28,9 +29,8 @@ seats.forEach(seat => movieRoom.addSeat(seat));
 // Create movie and showtime
 const movie = new Movie("MOV001", "The Adventure", "Action", [], "A thrilling adventure", "120", "2025-06-01");
 const showtime = new ShowTime("SHOW001", "2025-06-04T18:00:00", "2025-06-04T20:00:00", 10, movieRoom, movie);
-cinema.addShowtime(showtime);
-movieRoom.addShowtime(showtime);
 movie.addShowTime(showtime);
+cinema.addShowtime(showtime);
 
 // Create movie manager
 const movieManager = new MovieManager([movie]);
@@ -38,10 +38,10 @@ const movieManager = new MovieManager([movie]);
 // Create users
 const soda = new User("Soda", "soda@gmail.com", "+855978049375", "Soda12", "soda1225");
 const giyu = new User("Giyu", "giyu@gmail.com", "+85599861664", "Giyu13", "giyu1225");
-const Gigi = new User("Gigi","gig@gmail.com","+855 9981323","gigi12","gigi1225");
+const gigi = new User("Gigi", "gig@gmail.com", "+8559981323", "gigi12", "gigi1225");
 User.register(soda);
 User.register(giyu);
-User.register(Gigi);
+User.register(gigi);
 
 // Create cinema staff
 const staff = new CinemaStaff(1, cinema, "John Staff", "john@cinema.com", "+855123456789");
@@ -50,29 +50,75 @@ cinema.addCinemaStaff(staff);
 // Create promotion
 const promotion = new Promotion(1, "SUMMER25", 10, "Summer discount", true);
 
+// Function to display all user information
+function displayAllUsers() {
+    const users = [soda, giyu, gigi]; // Use User.registeredUsers if implemented
+
+    console.log("\nUser Accounts:");
+    console.log("---------------------------");
+
+    users.forEach(user => {
+        console.log(`Name: '${user.getName()}'`);
+        console.log(`Email: '${user.getEmail()}'`);
+        console.log(`Phone: '${user.getPhone()}'`);
+        console.log(`Username: '${user.getUsername()}'`);
+
+        const upcoming = user.getBookingHistory().getUpcomingBookings();
+        const past = user.getBookingHistory().getPastBookings();
+        const reviews = user.getReviews ? user.getReviews() : [];
+
+        // Format booking info like in the screenshot
+        const formatBookings = (bookings: any[]) => {
+            return bookings.map(b => `'${b.getShowtime().getMovie().getTitle()}' on '${new Date(b.getShowtime().getStartTime()).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })}'`);
+        };
+
+        console.log("Upcoming Bookings:", formatBookings(upcoming));
+        console.log("Past Bookings:", formatBookings(past));
+
+        if (reviews.length > 0) {
+            console.log("Reviews:", reviews.map(r =>
+                `'${r.getMovie().getTitle()}' rated ${r.getRating()} - "${r.getComment()}"`
+            ));
+        } else {
+            console.log("Reviews: []");
+        }
+
+        console.log("---------------------------");
+    });
+}
+
+
 // Demonstrate movie booking process
 function demonstrateMovieBookingProcess() {
     console.log("\n🎬 Welcome to City Cinema Booking System 🎬");
     console.log("=========================================");
 
-    console.log("\n1. Browsing Movies and Showtimes");
+    console.log("\n1. Viewing All Users");
+    console.log("-------------------");
+    try {
+        displayAllUsers();
+    } catch (error) {
+        console.error("Error displaying users:", error instanceof Error ? error.message : "Unknown error");
+    }
+
+    console.log("\n2. Browsing Movies and Showtimes");
     console.log("--------------------------------");
     try {
         console.log("Available movies in genre 'Action':", movieManager.filterMoviesByGenre("Action").map(m => m.getTitle()).join(", "));
         console.log("Showtimes for 'The Adventure':", movie.getShowTimes().map(s => new Date(s.getStartTime()).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })));
     } catch (error) {
-        console.error("Error browsing movies:", (error as Error).message);
+        console.error("Error browsing movies:", error instanceof Error ? error.message : "Unknown error");
     }
 
-    console.log("\n2. Checking Seat Availability");
+    console.log("\n3. Checking Seat Availability");
     console.log("-----------------------------");
     try {
         console.log("Available seats in Screen 1:", movieRoom.getAvailableSeats().map(s => `${s.getSeatId()} (${s.getZipZone()})`).join(", "));
     } catch (error) {
-        console.error("Error checking seats:", (error as Error).message);
+        console.error("Error checking seats:", error instanceof Error ? error.message : "Unknown error");
     }
 
-    console.log("\n3. Booking Tickets with Promotion");
+    console.log("\n4. Booking Tickets with Promotion");
     console.log("---------------------------------");
     let booking;
     try {
@@ -82,7 +128,6 @@ function demonstrateMovieBookingProcess() {
         console.log(`Booking successful! Booking ID: ${booking.getId()}`);
         console.log("Tickets issued:", booking.getTicket().map(t => t.generateQRCode()).join(", "));
 
-        // Display payment details
         const payment = booking.getPayment();
         if (payment) {
             console.log("Payment Summary:");
@@ -92,25 +137,26 @@ function demonstrateMovieBookingProcess() {
             console.log(`- Total Paid: $${payment.getTotal().toFixed(2)}`);
             console.log(`- Payment Method: ${payment.getPaymentMethod()}`);
             console.log(`- Payment Status: ${payment.getStatus()}`);
+        } else {
+            console.log("No payment details available.");
         }
 
-        // Send notification
-        const notification = new Notifications("NOTIF001", "", "Booking", new Date());
+        const notification = new Notifications("NOTIF001", "Booking Confirmation", "Booking", new Date());
         notification.sendBookingConfirmation(soda, booking);
     } catch (error) {
-        console.error("Booking failed:", (error as Error).message);
+        console.error("Booking failed:", error instanceof Error ? error.message : "Unknown error");
     }
 
-    console.log("\n4. Viewing Bookings");
+    console.log("\n5. Viewing Bookings");
     console.log("-------------------");
     try {
         console.log(`${soda.getName()}'s upcoming bookings:`, soda.getBookingHistory().getUpcomingBookings().map(b => b.getId()).join(", ") || "None");
         console.log(`${soda.getName()}'s past bookings:`, soda.getBookingHistory().getPastBookings().map(b => b.getId()).join(", ") || "None");
     } catch (error) {
-        console.error("Error viewing bookings:", (error as Error).message);
+        console.error("Error viewing bookings:", error instanceof Error ? error.message : "Unknown error");
     }
 
-    console.log("\n5. Validating Ticket at Cinema");
+    console.log("\n6. Validating Ticket at Cinema");
     console.log("-----------------------------");
     try {
         const ticket = booking?.getTicket()[0];
@@ -121,10 +167,10 @@ function demonstrateMovieBookingProcess() {
             console.log("No ticket found for validation.");
         }
     } catch (error) {
-        console.error("Error validating ticket:", (error as Error).message);
+        console.error("Error validating ticket:", error instanceof Error ? error.message : "Unknown error");
     }
 
-    console.log("\n6. Rating and Reviewing Movie");
+    console.log("\n7. Rating and Reviewing Movie");
     console.log("-----------------------------");
     try {
         const review = new Review(1, showtime.getShowtimeId(), "4.5", "Great movie, action-packed!", soda, movie);
@@ -135,7 +181,7 @@ function demonstrateMovieBookingProcess() {
         console.log(`- Rating: ${review.getRating()} / 5`);
         console.log(`- Movie Average Rating: ${movie.getAverageRating()} / 5`);
     } catch (error) {
-        console.error("Error submitting review:", (error as Error).message);
+        console.error("Error submitting review:", error instanceof Error ? error.message : "Unknown error");
     }
 
     console.log("\n=========================================");
@@ -145,18 +191,14 @@ function demonstrateMovieBookingProcess() {
 // Execute demonstration
 demonstrateMovieBookingProcess();
 
-
-console.log("Welcome to Cineplex Booking System");
-
-
 // Initialize Cinema and MovieRoom
-const cinema1 = new Cinema("CIN1", "Cinema 1", "123 Main St");
-const movieRoom1 = new MovieRoom("ROOM1", "Room A", cinema);
-movieRoom.addSeat(new Seat("SEAT1", "A", "1", ZipZone.STANDARD, "10"));
-movieRoom.addSeat(new Seat("SEAT2", "A", "2", ZipZone.STANDARD, "10"));
+const cinema1 = new Cinema("CIN001", "Cinema 1", "123 Main St");
+const movieRoom1 = new MovieRoom("ROOM1", "Room A", cinema1);
+movieRoom1.addSeat(new Seat("SEAT1", "A", "1", ZipZone.STANDARD, "10"));
+movieRoom1.addSeat(new Seat("SEAT2", "A", "2", ZipZone.STANDARD, "10"));
 
 // Initialize MovieManager
-const movieManager1 = new MovieManager();
+const movieManager1 = new MovieManager([]);
 
 // Add existing movie
 const inception = new Movie(
@@ -168,7 +210,7 @@ const inception = new Movie(
     "2h 28m",
     "2010-07-16"
 );
-movieManager.addMovie(inception);
+movieManager1.addMovie(inception);
 
 // Add a showtime for Inception
 const showtime1 = new ShowTime(
@@ -176,12 +218,12 @@ const showtime1 = new ShowTime(
     "2025-06-03T15:00:00",
     "2025-06-03T17:30:00",
     10,
-    movieRoom,
+    movieRoom1,
     inception
 );
-inception.addShowTime(showtime);
-movieRoom.getShowtimes().push(showtime);
-cinema.addShowtime(showtime);
+inception.addShowTime(showtime1);
+movieRoom1.addShowtime(showtime1);
+cinema1.addShowtime(showtime1);
 
 // Add a new movie to trigger notification
 const newMovie = new Movie(
@@ -193,23 +235,24 @@ const newMovie = new Movie(
     "2h 16m",
     "1999-03-31"
 );
-movieManager.addMovie(newMovie);
+movieManager1.addMovie(newMovie);
 
 // Filter movies and showtimes
 const criteria = {
     genre: "Sci-Fi",
     date: "2025-06-03",
-    cinemaId: "CIN1",
+    cinemaId: "CIN001",
     timeRange: { start: "2025-06-03T14:00:00", end: "2025-06-03T20:00:00" }
 };
 
-const results = movieManager.filterMoviesAndShowtimes(criteria);
+console.log("\nWelcome to Cineplex Booking System");
+const results = movieManager1.filterMoviesAndShowtimes(criteria);
 console.log("Filtered Movies and Showtimes:");
 results.forEach(({ movie, showtimes }) => {
     console.log(`Movie: ${movie.getTitle()}`);
     showtimes.forEach(showtime => {
         console.log(
-            `  Showtime: ${showtime.getShowtimeId()} at ${showtime.getStartTime()} ` +
+            `  Showtime: ${showtime.getShowtimeId()} at ${new Date(showtime.getStartTime()).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })} ` +
             `in ${showtime.getMovieRoom().getCinema().getAddress()}`
         );
     });
