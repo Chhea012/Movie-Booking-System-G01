@@ -63,13 +63,18 @@ function displayAllUsers() {
         console.log(`Phone: '${user.getPhone()}'`);
         console.log(`Username: '${user.getUsername()}'`);
 
-        const upcoming = user.getBookingHistory().getUpcomingBookings();
-        const past = user.getBookingHistory().getPastBookings();
+        const upcoming = user.getBookingHistory()?.getUpcomingBookings() || [];
+        const past = user.getBookingHistory()?.getPastBookings() || [];
         const reviews = user.getReviews ? user.getReviews() : [];
 
-        // Format booking info like in the screenshot
+        // Format booking info
         const formatBookings = (bookings: any[]) => {
-            return bookings.map(b => `'${b.getShowtime().getMovie().getTitle()}' on '${new Date(b.getShowtime().getStartTime()).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })}'`);
+            return bookings.map(b => {
+                const showtime = b.getShowtime();
+                const movie = showtime?.getMovie();
+                if (!showtime || !movie) return "Invalid booking";
+                return `'${movie.getTitle()}' on '${new Date(showtime.getStartTime()).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })}'`;
+            });
         };
 
         console.log("Upcoming Bookings:", formatBookings(upcoming));
@@ -77,7 +82,7 @@ function displayAllUsers() {
 
         if (reviews.length > 0) {
             console.log("Reviews:", reviews.map(r =>
-                `'${r.getMovie().getTitle()}' rated ${r.getRating()} - "${r.getComment()}"`
+                `'${r.getMovie()?.getTitle() || "Unknown Movie"}' rated ${r.getRating()} - "${r.getComment()}"`
             ));
         } else {
             console.log("Reviews: []");
@@ -86,7 +91,6 @@ function displayAllUsers() {
         console.log("---------------------------");
     });
 }
-
 
 // Demonstrate movie booking process
 function demonstrateMovieBookingProcess() {
@@ -150,8 +154,8 @@ function demonstrateMovieBookingProcess() {
     console.log("\n5. Viewing Bookings");
     console.log("-------------------");
     try {
-        console.log(`${soda.getName()}'s upcoming bookings:`, soda.getBookingHistory().getUpcomingBookings().map(b => b.getId()).join(", ") || "None");
-        console.log(`${soda.getName()}'s past bookings:`, soda.getBookingHistory().getPastBookings().map(b => b.getId()).join(", ") || "None");
+        console.log(`${soda.getName()}'s upcoming bookings:`, soda.getBookingHistory()?.getUpcomingBookings().map(b => b.getId()).join(", ") || "None");
+        console.log(`${soda.getName()}'s past bookings:`, soda.getBookingHistory()?.getPastBookings().map(b => b.getId()).join(", ") || "None");
     } catch (error) {
         console.error("Error viewing bookings:", error instanceof Error ? error.message : "Unknown error");
     }
@@ -179,7 +183,7 @@ function demonstrateMovieBookingProcess() {
         console.log(`${soda.getName()} submitted a review for 'The Adventure':`);
         console.log(`- Comment: ${review.getComment()}`);
         console.log(`- Rating: ${review.getRating()} / 5`);
-        console.log(`- Movie Average Rating: ${movie.getAverageRating()} / 5`);
+        console.log(`- Movie Average Rating: ${movie.getAverageRating() || "Not rated yet"} / 5`);
     } catch (error) {
         console.error("Error submitting review:", error instanceof Error ? error.message : "Unknown error");
     }
@@ -225,7 +229,7 @@ inception.addShowTime(showtime1);
 movieRoom1.addShowtime(showtime1);
 cinema1.addShowtime(showtime1);
 
-// Add a new movie to trigger notification
+// Add a new movie
 const newMovie = new Movie(
     "MOV2",
     "The Matrix",
@@ -236,6 +240,36 @@ const newMovie = new Movie(
     "1999-03-31"
 );
 movieManager1.addMovie(newMovie);
+
+// Add a showtime for The Matrix
+const matrixShowtime = new ShowTime(
+    "SHOW2",
+    "2025-06-04T20:00:00",
+    "2025-06-04T22:16:00",
+    10,
+    movieRoom1,
+    newMovie
+);
+newMovie.addShowTime(matrixShowtime);
+movieRoom1.addShowtime(matrixShowtime);
+cinema1.addShowtime(matrixShowtime);
+
+// Display new movie details
+console.log("\nNew Movie Added:");
+console.log("----------------");
+console.log(`Title: ${newMovie.getTitle()}`);
+console.log(`Genre: ${newMovie.getGenre()}`);
+console.log(`Description: ${newMovie.getDescription()}`);
+console.log(`Duration: ${newMovie.getDuration()}`);
+console.log(`Release Date: ${newMovie.getReleaseDate()}`);
+console.log(`Showtimes: ${newMovie.getShowTimes().length > 0 ? 
+    newMovie.getShowTimes().map(s => new Date(s.getStartTime()).toLocaleString('en-US', { timeZone: 'Asia/Bangkok' })).join(", ") : 
+    "No showtimes scheduled yet"}`);
+console.log("----------------");
+
+// Send notification for new movie
+const notification = new Notifications("NOTIF002", "New Movie Added", "Movie", new Date());
+notification.sendNewMovieNotification([soda, giyu, gigi], newMovie);
 
 // Filter movies and showtimes
 const criteria = {

@@ -66,4 +66,9 @@ export class Notifications {
     getMessage(): string {
         return this.message;
     }
+    sendNewMovieNotification(users: User[], movie: Movie) {
+        users.forEach(user => {
+            console.log(`Notification sent to ${user.getName()}: New movie '${movie.getTitle()}' added!`);
+        });
+    }
 }

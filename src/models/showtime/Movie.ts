@@ -18,6 +18,22 @@ export class Movie {
         }
     }
 
+    getGenre(): string {
+        return this.genre;
+    }
+
+    getDescription(): string {
+        return this.description;
+    }
+
+    getDuration(): string {
+        return this.duration;
+    }
+
+    getReleaseDate(): string {
+        return this.releaseDate;
+    }
+
     updateDetails(idMovie: string, title: string, genre: string, description: string, duration: string, releaseDate: string): void {
         if (!idMovie || !title || !genre || !description || !duration || !releaseDate) {
             throw new Error("All movie details are required");
