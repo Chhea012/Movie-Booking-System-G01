@@ -90,3 +90,73 @@ function demonstrateUserStories() {
 
 // Execute demonstration
 demonstrateUserStories();
+
+
+console.log("Welcome to Cineplex Booking System");
+
+
+// Initialize Cinema and MovieRoom
+const cinema1 = new Cinema("CIN1", "Cinema 1", "123 Main St");
+const movieRoom1 = new MovieRoom("ROOM1", "Room A", cinema);
+movieRoom.addSeat(new Seat("SEAT1", "A", "1", ZipZone.STANDARD, "10"));
+movieRoom.addSeat(new Seat("SEAT2", "A", "2", ZipZone.STANDARD, "10"));
+
+// Initialize MovieManager
+const movieManager1 = new MovieManager();
+
+// Add existing movie
+const inception = new Movie(
+    "MOV1",
+    "Inception",
+    "Sci-Fi",
+    [],
+    "A mind-bending thriller",
+    "2h 28m",
+    "2010-07-16"
+);
+movieManager.addMovie(inception);
+
+// Add a showtime for Inception
+const showtime1 = new ShowTime(
+    "SHOW1",
+    "2025-06-03T15:00:00",
+    "2025-06-03T17:30:00",
+    10,
+    movieRoom,
+    inception
+);
+inception.addShowTime(showtime);
+movieRoom.getShowtimes().push(showtime);
+cinema.addShowtime(showtime);
+
+// Add a new movie to trigger notification
+const newMovie = new Movie(
+    "MOV2",
+    "The Matrix",
+    "Sci-Fi",
+    [],
+    "A cyberpunk action film",
+    "2h 16m",
+    "1999-03-31"
+);
+movieManager.addMovie(newMovie);
+
+// Filter movies and showtimes
+const criteria = {
+    genre: "Sci-Fi",
+    date: "2025-06-03",
+    cinemaId: "CIN1",
+    timeRange: { start: "2025-06-03T14:00:00", end: "2025-06-03T20:00:00" }
+};
+
+const results = movieManager.filterMoviesAndShowtimes(criteria);
+console.log("Filtered Movies and Showtimes:");
+results.forEach(({ movie, showtimes }) => {
+    console.log(`Movie: ${movie.getTitle()}`);
+    showtimes.forEach(showtime => {
+        console.log(
+            `  Showtime: ${showtime.getShowtimeId()} at ${showtime.getStartTime()} ` +
+            `in ${showtime.getMovieRoom().getCinema().getAddress()}`
+        );
+    });
+});

@@ -1,4 +1,5 @@
 import { Booking } from "../booking/Booking";
+import { Movie } from "../showtime/Movie";
 import { ShowTime } from "../showtime/ShowTime";
 import { User } from "../user/User";
 
@@ -47,7 +48,17 @@ export class Notifications {
         this.sentAt = new Date();
         console.log(`${this.type}: ${this.message} for user ${user.getUserId()} at ${this.sentAt}`);
     }
-
+    // add method to send new movie alert
+     sendNewMovieAlert(user: User, movie: Movie): void {
+        if (!user || !movie) {
+            throw new Error("User and movie are required");
+        }
+        this.message = `New movie added: ${movie.getTitle()} (${movie.getId()})`;
+        this.type = "New Movie Alert";
+        this.user = user;
+        this.sentAt = new Date();
+        console.log(`${this.type}: ${this.message} for user ${user.getUserId()} at ${this.sentAt}`);
+    }
     getUser(): User | undefined {
         return this.user;
     }

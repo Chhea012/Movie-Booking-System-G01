@@ -1,3 +1,5 @@
+import { Notifications } from "../notification/Notifications";
+import { User } from "../user/User";
 import { Movie } from "./Movie";
 import { ShowTime } from "./ShowTime";
 
@@ -9,6 +11,21 @@ export class MovieManager {
             throw new Error("Movie is required");
         }
         this.movies.push(movie);
+        // add console log to movie 
+        console.log(`Movie "${movie.getTitle()}" added successfully.`);
+
+        //add Send notification to all registered users
+        const users = User.getAllUsers();
+        users.forEach(user => {
+            const notification = new Notifications(
+                `NOTIF-MOVIE-${movie.getId()}-${user.getUserId()}`,
+                "",
+                "New Movie Alert",
+                new Date(),
+                user
+            );
+            notification.sendNewMovieAlert(user, movie);
+        });
     }
 
     filterMoviesByGenre(genre: string): Movie[] {
