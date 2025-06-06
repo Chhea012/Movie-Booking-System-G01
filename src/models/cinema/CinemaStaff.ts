@@ -1,8 +1,15 @@
-import { Person } from "../user/Person";
-import { Cinema } from "./Cinema";
-import { Ticket } from "../booking/Ticket";
+// Import necessary classes
+import { Person } from "../user/Person"; // Inherits basic info like name, email, phone
+import { Cinema } from "./Cinema";       // Represents the cinema the staff belongs to
+import { Ticket } from "../booking/Ticket"; // (Imported but not used in this class)
 
+/**
+ * CinemaStaff class extends Person to represent a staff member working at a specific cinema.
+ */
 export class CinemaStaff extends Person {
+    private idCinemaStaff: number; // Unique ID for the cinema staff member
+    private cinema: Cinema;        // The cinema the staff is assigned to
+
     /**
      * Constructor for creating a CinemaStaff instance.
      * @param idCinemaStaff - The unique ID of the staff member.
@@ -12,16 +19,18 @@ export class CinemaStaff extends Person {
      * @param phone - The phone number of the staff member.
      */
     constructor(
-        private idCinemaStaff: number,
-        private cinema: Cinema,
+        idCinemaStaff: number,
+        cinema: Cinema,
         name: string,
         email: string,
         phone: string
     ) {
-        super(name, email, phone);
+        super(name, email, phone); // Call the Person constructor
         if (!idCinemaStaff || !cinema) {
             throw new Error("Staff ID and cinema are required");
         }
+        this.idCinemaStaff = idCinemaStaff;
+        this.cinema = cinema;
     }
 
     /**
@@ -55,6 +64,7 @@ export class CinemaStaff extends Person {
 
     /**
      * Validates a QR code string.
+     * Expected format: "QR-xxxx-xxxx" (must start with "QR-" and have at least 3 parts when split by "-").
      * @param qrCode - The QR code string to validate.
      * @returns True if the QR code format is valid, otherwise false.
      */
@@ -79,16 +89,12 @@ export class CinemaStaff extends Person {
 
     /**
      * Updates the contact details of the staff member.
+     * Uses inherited updateDetails from Person.
      * @param email - The new email address.
      * @param phone - The new phone number.
-     * Throws an error if either value is missing.
      */
     updateContactDetails(email: string, phone: string): void {
-        if (!email || !phone) {
-            throw new Error("Email and phone must be provided");
-        }
-        this.email = email;
-        this.phone = phone;
+        this.updateDetails(this.getName(), email, phone); // Reuse Person's method
     }
 
     /**
