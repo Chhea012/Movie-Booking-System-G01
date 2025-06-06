@@ -2,15 +2,21 @@ import { Movie } from "./Movie";
 import { MovieRoom } from "./MovieRoom";
 import { Seat } from "../booking/Seat";
 import { ZipZone } from "../enum/ZipZone";
+
+/**
+ * Represents a scheduled showtime for a movie in a specific movie room.
+ * Includes pricing, seat availability, and time validation logic.
+ */
 export class ShowTime {
     /**
-     * Constructor to create a ShowTime instance.
+     * Constructs a new ShowTime instance.
      * @param showtimeId - Unique identifier for the showtime.
      * @param startTime - Start time of the showtime (ISO string format).
      * @param endTime - End time of the showtime (ISO string format).
-     * @param price - Base price for the showtime.
-     * @param movieRoom - The MovieRoom object where this showtime is scheduled.
-     * @param movie - The Movie object being shown.
+     * @param price - Base price for the showtime (must be non-negative).
+     * @param movieRoom - The movie room in which the showtime is held.
+     * @param movie - The movie associated with the showtime.
+     * Throws an error if the times are invalid or price is negative.
      */
     constructor(
         private showtimeId: string,
@@ -27,10 +33,10 @@ export class ShowTime {
     }
 
     /**
-     * Validates the start and end times for logical and date validity.
-     * @param startTime - Start time (string).
-     * @param endTime - End time (string).
-     * Throws an error if invalid or illogical.
+     * Validates that start time and end time are valid and start is before end.
+     * @param startTime - The start time string.
+     * @param endTime - The end time string.
+     * Throws an error if the times are invalid or logically incorrect.
      */
     private validateTimes(startTime: string, endTime: string): void {
         const start = new Date(startTime);
@@ -44,12 +50,12 @@ export class ShowTime {
     }
 
     /**
-     * Updates showtime details.
+     * Updates the showtime's details.
      * @param showtimeId - New showtime ID.
      * @param startTime - New start time.
      * @param endTime - New end time.
-     * @param price - New base price.
-     * Throws an error if data is invalid.
+     * @param price - New price.
+     * Throws an error if time is invalid or price is negative.
      */
     updateDetails(showtimeId: string, startTime: string, endTime: string, price: number): void {
         this.validateTimes(startTime, endTime);
@@ -63,7 +69,7 @@ export class ShowTime {
     }
 
     /**
-     * Retrieves all available seats for this showtime.
+     * Gets all available seats for the showtime.
      * @returns An array of available Seat objects.
      */
     getAvailableSeats(): Seat[] {
@@ -71,18 +77,18 @@ export class ShowTime {
     }
 
     /**
-     * Checks if a specific seat is available.
-     * @param seat - The Seat object to check.
-     * @returns True if available, false otherwise.
+     * Checks whether a given seat is available for the showtime.
+     * @param seat - The seat to check.
+     * @returns True if the seat is available; false otherwise.
      */
     isSeatAvailable(seat: Seat): boolean {
         return this.getAvailableSeats().some(s => s.getSeatId() === seat.getSeatId());
     }
 
     /**
-     * Calculates the final price of a seat based on its zone.
-     * @param seat - The Seat object.
-     * @returns The price adjusted by zone.
+     * Calculates the price for a specific seat based on its zone.
+     * @param seat - The seat to calculate price for.
+     * @returns Calculated price for the seat.
      */
     calculatePrice(seat: Seat): number {
         const basePrice = this.price;
@@ -99,7 +105,7 @@ export class ShowTime {
     }
 
     /**
-     * Retrieves the Movie object for this showtime.
+     * Retrieves the movie associated with the showtime.
      * @returns The Movie object.
      */
     getMovie(): Movie {
@@ -107,7 +113,7 @@ export class ShowTime {
     }
 
     /**
-     * Retrieves the MovieRoom object for this showtime.
+     * Retrieves the movie room where the showtime is scheduled.
      * @returns The MovieRoom object.
      */
     getMovieRoom(): MovieRoom {
@@ -115,10 +121,9 @@ export class ShowTime {
     }
 
     /**
-     * Filters this showtime based on a target time.
-     * @param time - The target time to check (ISO string format).
-     * @returns An array containing this showtime if it occurs at the given time, else empty.
-     * Throws an error if time is invalid.
+     * Filters this showtime by a given time.
+     * @param time - The target time to check (ISO string).
+     * @returns An array containing this showtime if it matches; otherwise, empty array.
      */
     filterShowtimesByTime(time: string): ShowTime[] {
         const target = new Date(time);
@@ -135,15 +140,15 @@ export class ShowTime {
 
     /**
      * Retrieves the showtime ID.
-     * @returns The showtime's unique ID string.
+     * @returns The showtime ID string.
      */
     getShowtimeId(): string {
         return this.showtimeId;
     }
 
     /**
-     * Determines if the showtime is currently active.
-     * @returns True if active now, false otherwise.
+     * Checks if the showtime is currently active.
+     * @returns True if the current time is between the start and end time.
      */
     isShowtimeActive(): boolean {
         const now = new Date();
@@ -164,26 +169,34 @@ export class ShowTime {
     }
 
     /**
-     * Checks if there are any available seats.
-     * @returns True if available seats exist, false otherwise.
+     * Checks if the showtime has any available seats.
+     * @returns True if there are available seats; false otherwise.
      */
     hasSeatsAvailable(): boolean {
         return this.getAvailableSeats().length > 0;
     }
 
     /**
-     * Retrieves the start time of the showtime.
-     * @returns Start time as a string.
+     * Gets the start time of the showtime.
+     * @returns The start time string.
      */
     getStartTime(): string {
         return this.startTime;
     }
 
     /**
-     * Retrieves the end time of the showtime.
-     * @returns End time as a string.
+     * Gets the end time of the showtime.
+     * @returns The end time string.
      */
     getEndTime(): string {
         return this.endTime;
+    }
+
+    /**
+     * Gets the base price of the showtime.
+     * @returns The price as a number.
+     */
+    getPrice(): number {
+        return this.price;
     }
 }

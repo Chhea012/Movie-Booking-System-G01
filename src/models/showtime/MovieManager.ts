@@ -3,27 +3,29 @@ import { User } from "../user/User";
 import { Movie } from "./Movie";
 import { ShowTime } from "./ShowTime";
 
+/**
+ * Class responsible for managing movie operations such as adding movies,
+ * filtering by genre, and retrieving movies with their showtimes based on criteria.
+ */
 export class MovieManager {
     /**
-     * Constructor to initialize the MovieManager with an optional array of movies.
-     * @param movies - Optional array of Movie objects.
+     * Initializes the MovieManager with an optional array of movies.
+     * @param movies - Optional array of Movie objects to initialize with.
      */
     constructor(private movies: Movie[] = []) {}
 
     /**
-     * Adds a new movie to the movie list and sends notifications to all registered users.
-     * @param movie - A Movie object to be added.
-     * @throws Error if movie is not provided.
+     * Adds a new movie to the manager and notifies all users about the new movie.
+     * @param movie - Movie instance to add.
+     * Throws an error if the movie is not provided.
      */
     addMovie(movie: Movie): void {
         if (!movie) {
             throw new Error("Movie is required");
         }
         this.movies.push(movie);
-        // add console log to movie 
         console.log(`Movie "${movie.getTitle()}" added successfully.`);
 
-        //add Send notification to all registered users
         const users = User.getAllUsers();
         users.forEach(user => {
             const notification = new Notifications(
@@ -38,10 +40,10 @@ export class MovieManager {
     }
 
     /**
-     * Filters the movie list by a specific genre.
+     * Filters the stored movies by a specific genre.
      * @param genre - The genre to filter movies by.
-     * @returns An array of Movie objects matching the provided genre.
-     * @throws Error if genre is not provided.
+     * @returns Array of movies matching the specified genre.
+     * Throws an error if the genre is not provided.
      */
     filterMoviesByGenre(genre: string): Movie[] {
         if (!genre) {
@@ -51,13 +53,13 @@ export class MovieManager {
     }
 
     /**
-     * Filters movies and their associated showtimes based on provided criteria.
-     * @param criteria - An object containing optional filtering criteria: genre, date, cinemaId, and timeRange.
-     * @param criteria.genre - Optional genre to filter movies by.
-     * @param criteria.date - Optional date to filter showtimes by (uses current date if provided).
-     * @param criteria.cinemaId - Optional cinema ID to filter showtimes by.
-     * @param criteria.timeRange - Optional object with start and end times to filter showtimes by.
-     * @returns An array of objects, each containing a movie and its matching showtimes.
+     * Filters movies and their showtimes based on provided criteria.
+     * @param criteria - Object containing optional filters:
+     *  - genre: Filter by movie genre.
+     *  - date: Filter showtimes by a specific date (YYYY-MM-DD).
+     *  - cinemaId: Filter showtimes by cinema ID.
+     *  - timeRange: Filter showtimes by start and end times.
+     * @returns Array of objects each containing a movie and its filtered showtimes.
      */
     filterMoviesAndShowtimes(criteria: {
         genre?: string;
@@ -65,33 +67,33 @@ export class MovieManager {
         cinemaId?: string;
         timeRange?: { start: string; end: string };
     }): { movie: Movie; showtimes: ShowTime[] }[] {
-        // Filter movies by genre if provided
         let filteredMovies = this.movies;
         if (criteria.genre) {
             filteredMovies = this.filterMoviesByGenre(criteria.genre);
         }
 
-        // Collect showtimes for each movie based on criteria
         const result: { movie: Movie; showtimes: ShowTime[] }[] = [];
         for (const movie of filteredMovies) {
             let showtimes = movie.getShowTimes();
-            
-            // Filter by date if provided
-            if (criteria.date) {
+
+            // Determine date filter
+            let targetDate: string | undefined = criteria.date;
+            if (!targetDate && criteria.timeRange) {
+                targetDate = new Date(criteria.timeRange.start).toISOString().split('T')[0];
+            }
+            if (targetDate) {
                 showtimes = showtimes.filter(showtime => {
-                    const showDate = new Date(showtime.getStartTime()).toDateString();
-                    return showDate === new Date().toDateString();
+                    const showDate = new Date(showtime.getStartTime()).toISOString().split('T')[0];
+                    return showDate === targetDate;
                 });
             }
 
-            // Filter by cinemaId if provided
             if (criteria.cinemaId) {
                 showtimes = showtimes.filter(showtime =>
                     showtime.getMovieRoom().getCinema().getCinemaId() === criteria.cinemaId
                 );
             }
 
-            // Filter by time range if provided
             if (criteria.timeRange) {
                 showtimes = showtimes.filter(showtime => {
                     const showStart = new Date(showtime.getStartTime()).getTime();
@@ -101,7 +103,6 @@ export class MovieManager {
                 });
             }
 
-            // Only include movies with matching showtimes
             if (showtimes.length > 0) {
                 result.push({ movie, showtimes });
             }
@@ -109,10 +110,10 @@ export class MovieManager {
 
         return result;
     }
-    
+
     /**
-     * Retrieves the full list of movies.
-     * @returns A new array containing all Movie objects.
+     * Returns a copy of the current list of movies.
+     * @returns Array of all movies.
      */
     getMovies(): Movie[] {
         return [...this.movies];

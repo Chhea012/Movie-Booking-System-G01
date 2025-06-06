@@ -130,5 +130,11 @@ export class Cinema {
     getCinemaId(): string {
         return this.cinemaId;
     }
-    
+    /**
+     * Returns the getname of the cinema.
+     * @returns Cinema name as a string
+     */
+    getName(): string {
+        return this.name;
+    }
 }
