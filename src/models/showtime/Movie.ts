@@ -1,5 +1,6 @@
 import { Review } from "../review/Review";
 import { ShowTime } from "./ShowTime";
+
 export class Movie {
     private showTimes: ShowTime[] = [];
 
@@ -28,23 +29,72 @@ export class Movie {
         }
     }
 
+    /**
+     * Retrieves the movie's unique ID.
+     * @returns The movie ID.
+     */
+    getId(): string {
+        return this.idMovie;
+    }
+
+    /**
+     * Retrieves the movie title.
+     * @returns The movie title.
+     */
+    getTitle(): string {
+        return this.title;
+    }
+
+    /**
+     * Retrieves the genre of the movie.
+     * @returns The genre string.
+     */
     getGenre(): string {
         return this.genre;
     }
 
+    /**
+     * Retrieves the movie description.
+     * @returns Description string.
+     */
     getDescription(): string {
         return this.description;
     }
 
+    /**
+     * Retrieves the movie duration.
+     * @returns Duration string (e.g., "2h 15m").
+     */
     getDuration(): string {
         return this.duration;
     }
 
+    /**
+     * Retrieves the release date of the movie.
+     * @returns Release date string.
+     */
     getReleaseDate(): string {
         return this.releaseDate;
     }
 
-    updateDetails(idMovie: string, title: string, genre: string, description: string, duration: string, releaseDate: string): void {
+    /**
+     * Updates movie details.
+     * @param idMovie - New movie ID.
+     * @param title - New movie title.
+     * @param genre - New genre.
+     * @param description - New description.
+     * @param duration - New duration.
+     * @param releaseDate - New release date.
+     * Throws error if any parameter is missing.
+     */
+    updateDetails(
+        idMovie: string,
+        title: string,
+        genre: string,
+        description: string,
+        duration: string,
+        releaseDate: string
+    ): void {
         if (!idMovie || !title || !genre || !description || !duration || !releaseDate) {
             throw new Error("All movie details are required");
         }
@@ -57,8 +107,8 @@ export class Movie {
     }
 
     /**
-     * Retrieves the list of showtimes for the movie.
-     * @returns An array of ShowTime objects.
+     * Retrieves all showtimes for this movie.
+     * @returns Array of ShowTime objects.
      */
     getShowTimes(): ShowTime[] {
         return [...this.showTimes];
@@ -66,8 +116,8 @@ export class Movie {
 
     /**
      * Adds a new showtime for the movie.
-     * @param showtime - A ShowTime object to be added.
-     * Throws an error if showtime is missing.
+     * @param showtime - ShowTime object to add.
+     * Throws error if showtime is missing.
      */
     addShowTime(showtime: ShowTime): void {
         if (!showtime) {
@@ -77,35 +127,17 @@ export class Movie {
     }
 
     /**
-     * Retrieves all reviews for the movie.
-     * @returns An array of Review objects.
+     * Retrieves all reviews of the movie.
+     * @returns Array of Review objects.
      */
     getReviews(): Review[] {
         return [...this.reviews];
     }
 
     /**
-     * Retrieves the movie title.
-     * @returns The movie title.
-     */
-    getTitle(): string {
-        return this.title;
-    }
-
-    /**
-     * Calculates the average rating for the movie based on its reviews.
-     * @returns The average rating as a number (fixed to 1 decimal place).
-     */
-    getAverageRating(): number {
-        if (this.reviews.length === 0) return 0;
-        const totalRating = this.reviews.reduce((sum, review) => sum + parseFloat(review.getRating()), 0);
-        return Number((totalRating / this.reviews.length).toFixed(1));
-    }
-
-    /**
      * Adds a new review to the movie.
-     * @param review - A Review object to be added.
-     * Throws an error if review is missing.
+     * @param review - Review object to add.
+     * Throws error if review is missing.
      */
     addReview(review: Review): void {
         if (!review) {
@@ -115,10 +147,23 @@ export class Movie {
     }
 
     /**
-     * Filters the movie by its genre.
-     * @param genre - The genre to filter by.
-     * @returns An array containing the movie if it matches the genre, otherwise an empty array.
-     * Throws an error if genre is missing.
+     * Calculates the average rating of the movie based on reviews.
+     * @returns Average rating as number with one decimal place.
+     */
+    getAverageRating(): number {
+        if (this.reviews.length === 0) return 0;
+        const totalRating = this.reviews.reduce(
+            (sum, review) => sum + parseFloat(review.getRating()),
+            0
+        );
+        return Number((totalRating / this.reviews.length).toFixed(1));
+    }
+
+    /**
+     * Filters the movie by genre.
+     * @param genre - Genre to filter by.
+     * @returns Array containing this movie if genre matches, otherwise empty array.
+     * Throws error if genre is missing.
      */
     filterMovieByGenre(genre: string): Movie[] {
         if (!genre) {
@@ -128,19 +173,11 @@ export class Movie {
     }
 
     /**
-     * Checks if the movie's genre matches the provided genre.
-     * @param genre - The genre to compare.
+     * Checks if the movie genre matches a given genre.
+     * @param genre - Genre to compare.
      * @returns True if genres match, false otherwise.
      */
     matchesGenre(genre: string): boolean {
         return this.genre.toLowerCase() === genre.toLowerCase();
-    }
-
-    /**
-     * Retrieves the movie's unique ID.
-     * @returns The movie ID.
-     */
-    getId(): string {
-        return this.idMovie;
     }
 }

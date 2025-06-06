@@ -1,24 +1,39 @@
 import { Booking } from "./Booking";
 import { Seat } from "./Seat";
+
 export class Ticket {
+    private ticketId: string;
+    private qrCode: string;
+    private issueDate: string;
+    private seat: Seat;
+    private booking?: Booking;
+
     /**
      * Constructs a new Ticket object.
      * @param ticketId - Unique identifier for the ticket
      * @param qrCode - QR code string for the ticket (can be used for scanning)
-     * @param issueDate - Date when the ticket was issued (in string format)
+     * @param issueDate - Date when the ticket was issued (in ISO string format)
      * @param seat - The seat assigned to this ticket
      * @param booking - (Optional) The booking that includes this ticket
      */
     constructor(
-        private ticketId: string,
-        private qrCode: string,
-        private issueDate: string,
-        private seat: Seat,
-        private booking?: Booking
+        ticketId: string,
+        qrCode: string,
+        issueDate: string,
+        seat: Seat,
+        booking?: Booking
     ) {
         if (!ticketId || !qrCode || !issueDate || !seat) {
             throw new Error("Ticket ID, QR code, issue date, and seat are required");
         }
+        if (isNaN(new Date(issueDate).getTime())) {
+            throw new Error("Invalid issue date format");
+        }
+        this.ticketId = ticketId;
+        this.qrCode = qrCode;
+        this.issueDate = issueDate;
+        this.seat = seat;
+        this.booking = booking;
     }
 
     /**
@@ -40,7 +55,6 @@ export class Ticket {
 
     /**
      * Returns the seat assigned to this ticket.
-     * @returns Seat object.
      */
     getSeat(): Seat {
         return this.seat;
@@ -48,7 +62,6 @@ export class Ticket {
 
     /**
      * Returns the booking associated with the ticket, if any.
-     * @returns Booking object or null if not set.
      */
     getBooking(): Booking | null {
         return this.booking || null;
@@ -56,7 +69,7 @@ export class Ticket {
 
     /**
      * Updates the issue date of the ticket.
-     * @param issueDate - New issue date (must be a valid date string)
+     * @param issueDate - New issue date (must be a valid ISO date string)
      */
     updateIssueDate(issueDate: string): void {
         if (!issueDate || isNaN(new Date(issueDate).getTime())) {
@@ -67,17 +80,31 @@ export class Ticket {
 
     /**
      * Generates a new QR code string using ticket ID and current timestamp.
-     * @returns A new QR code string.
      */
     generateQRCode(): string {
-        return `QR-${this.ticketId}-${new Date().toISOString()}`;
+        const newQRCode = `QR-${this.ticketId}-${new Date().toISOString()}`;
+        this.qrCode = newQRCode;
+        return newQRCode;
     }
 
     /**
      * Returns the ticket's unique identifier.
-     * @returns Ticket ID as a string.
      */
     getTicketId(): string {
         return this.ticketId;
+    }
+
+    /**
+     * Returns the QR code of the ticket.
+     */
+    getQRCode(): string {
+        return this.qrCode;
+    }
+
+    /**
+     * Returns the issue date of the ticket.
+     */
+    getIssueDate(): string {
+        return this.issueDate;
     }
 }
