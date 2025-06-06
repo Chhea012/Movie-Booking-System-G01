@@ -11,6 +11,16 @@ const users: User[] = [];
 export class User extends Person {
     private bookingHistory: BookingHistory;
     
+    /**
+     * Initializes a new User instance with personal details and booking history.
+     * @param name The name of the user.
+     * @param email The email address of the user.
+     * @param phone The phone number of the user.
+     * @param userId The unique identifier for the user.
+     * @param password The password for the user account.
+     * @param bookings An optional array of Booking objects (defaults to empty array).
+     * @param reviews An optional array of Review objects (defaults to empty array).
+     */
     constructor(
         name: string,
         email: string,
@@ -24,6 +34,11 @@ export class User extends Person {
         this.bookingHistory = new BookingHistory(`HIST-${userId}`, userId);
     }
 
+    /**
+     * Registers a new user by validating their details and adding them to the users list.
+     * @param user The User object containing details like name, email, phone, userId, and password.
+     * @throws Error if validation fails (e.g., invalid email, short password, or duplicate email/userId).
+     */
     public static register(user: User): void {
         if (!user.getName() || user.getName().trim().length < 2) {
             throw new Error("Name must be at least 2 characters long.");
@@ -61,6 +76,13 @@ export class User extends Person {
         console.log(`User "${user.getName()}" registered successfully.`);
     }
 
+    /**
+     * Logs in a user by verifying their email and password.
+     * @param email The email address of the user attempting to log in.
+     * @param password The password provided by the user.
+     * @returns The User object if login is successful.
+     * @throws Error if email is invalid, password is incorrect, or user is not found.
+     */
     public static login(email: string, password: string): User {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -85,22 +107,46 @@ export class User extends Person {
         return user;
     }
 
+    /**
+     * Retrieves a list of all registered users.
+     * @returns A copy of the array containing all User objects.
+     */
     public static getAllUsers(): User[] {
         return [...users];
     }
 
+    /**
+     * Gets the user ID of the current user.
+     * @returns The user ID as a string.
+     */
     public getUserId(): string {
         return this.userId;
     }
 
+    /**
+     * Gets the password of the current user.
+     * @returns The password as a string.
+     */
     public getPassword(): string {
         return this.password;
     }
 
+    /**
+     * Retrieves the booking history of the current user.
+     * @returns The BookingHistory object associated with the user.
+     */
     public getBookingHistory(): BookingHistory {
         return this.bookingHistory;
     }
 
+    /**
+     * Creates a new booking for the user by reserving seats for a specific showtime.
+     * @param showtime The ShowTime object representing the movie showtime.
+     * @param seats An array of Seat objects the user wants to book.
+     * @param paymentMethod The payment method used to process the booking.
+     * @returns The created Booking object.
+     * @throws Error if the showtime is invalid, seats are unavailable, or payment fails.
+     */
     public createBooking(showtime: ShowTime, seats: Seat[], paymentMethod: string): Booking {
         if (!showtime || !showtime.hasSeatsAvailable()) {
             throw new Error("Invalid showtime or no seats available.");
@@ -146,6 +192,11 @@ export class User extends Person {
         return booking;
     }
 
+    /**
+     * Cancels an existing booking for the user.
+     * @param bookingId The ID of the booking to cancel.
+     * @throws Error if the booking is not found.
+     */
     public cancelBooking(bookingId: string): void {
         const booking = this.bookings.find(b => b.getId() === bookingId);
         if (!booking) {
@@ -155,6 +206,11 @@ export class User extends Person {
         this.bookingHistory.addEntry(`Booking ${bookingId} cancelled on ${new Date()}`);
     }
 
+    /**
+     * Adds a review to the user's list of reviews.
+     * @param review The Review object to add.
+     * @throws Error if the review is invalid or missing.
+     */
     public addReview(review: Review): void {
         if (!review) {
             throw new Error("Review is required");
@@ -163,6 +219,10 @@ export class User extends Person {
         this.bookingHistory.addEntry(`Review ${review.getReviewId()} added on ${new Date()}`);
     }
 
+    /**
+     * Retrieves all reviews submitted by the user.
+     * @returns A copy of the array containing all Review objects.
+     */
     public getReviews(): Review[] {
         return [...this.reviews];
     }
