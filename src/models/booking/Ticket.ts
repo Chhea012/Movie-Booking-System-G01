@@ -1,13 +1,11 @@
 import { Booking } from "./Booking";
 import { Seat } from "./Seat";
-
 export class Ticket {
     private ticketId: string;
     private qrCode: string;
     private issueDate: string;
     private seat: Seat;
     private booking?: Booking;
-
     /**
      * Constructs a new Ticket object.
      * @param ticketId - Unique identifier for the ticket
@@ -52,21 +50,18 @@ export class Ticket {
             price
         );
     }
-
     /**
      * Returns the seat assigned to this ticket.
      */
     getSeat(): Seat {
         return this.seat;
     }
-
     /**
      * Returns the booking associated with the ticket, if any.
      */
     getBooking(): Booking | null {
         return this.booking || null;
     }
-
     /**
      * Updates the issue date of the ticket.
      * @param issueDate - New issue date (must be a valid ISO date string)
@@ -77,7 +72,6 @@ export class Ticket {
         }
         this.issueDate = issueDate;
     }
-
     /**
      * Generates a new QR code string using ticket ID and current timestamp.
      */
@@ -86,21 +80,18 @@ export class Ticket {
         this.qrCode = newQRCode;
         return newQRCode;
     }
-
     /**
      * Returns the ticket's unique identifier.
      */
     getTicketId(): string {
         return this.ticketId;
     }
-
     /**
      * Returns the QR code of the ticket.
      */
     getQRCode(): string {
         return this.qrCode;
     }
-
     /**
      * Returns the issue date of the ticket.
      */
