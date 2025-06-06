@@ -4,6 +4,12 @@ import { User } from "../user/User";
 export class BookingHistory {
     private entries: string[] = [];
 
+    /**
+     * Constructor to initialize booking history.
+     * @param historyId - Unique ID of the history record.
+     * @param userId - ID of the user owning this history.
+     * @param bookings - Optional list of existing bookings.
+     */
     constructor(
         private historyId: string,
         private userId: string,
@@ -14,18 +20,31 @@ export class BookingHistory {
         }
     }
 
+    /**
+     * Returns the unique ID of the booking history.
+     */
     getHistoryId(): string {
         return this.historyId;
     }
 
+    /**
+     * Returns the user ID associated with this booking history.
+     */
     getUserId(): string {
         return this.userId;
     }
 
+    /**
+     * Returns a copy of all bookings in the history.
+     */
     getBookings(): Booking[] {
         return [...this.bookings];
     }
 
+    /**
+     * Returns the User object associated with the userId.
+     * Throws an error if the user is not found.
+     */
     getUser(): User {
         const user = User.getAllUsers().find(u => u.getUserId() === this.userId);
         if (!user) {
@@ -34,6 +53,10 @@ export class BookingHistory {
         return user;
     }
 
+    /**
+     * Adds a new booking to the history.
+     * @param booking - The booking to be added.
+     */
     addBooking(booking: Booking): void {
         if (!booking) {
             throw new Error("Booking is required");
@@ -41,6 +64,9 @@ export class BookingHistory {
         this.bookings.push(booking);
     }
 
+    /**
+     * Returns bookings that are scheduled in the future and not cancelled.
+     */
     getUpcomingBookings(): Booking[] {
         const now = new Date();
         return this.bookings.filter(booking => {
@@ -49,6 +75,9 @@ export class BookingHistory {
         });
     }
 
+    /**
+     * Returns bookings that have already happened or are cancelled.
+     */
     getPastBookings(): Booking[] {
         const now = new Date();
         return this.bookings.filter(booking => {
@@ -57,6 +86,11 @@ export class BookingHistory {
         });
     }
 
+    /**
+     * Updates the status of a specific booking.
+     * @param bookingId - ID of the booking to update.
+     * @param status - New status to assign to the booking.
+     */
     updateBookingStatus(bookingId: string, status: string): void {
         if (!bookingId || !status) {
             throw new Error("Booking ID and status are required");
@@ -69,6 +103,10 @@ export class BookingHistory {
         this.addEntry(`Booking ${bookingId} status updated to ${status} on ${new Date()}`);
     }
 
+    /**
+     * Adds a text entry to the booking history log.
+     * @param entry - Description of the action/event.
+     */
     addEntry(entry: string): void {
         if (!entry) {
             throw new Error("Entry cannot be empty");
@@ -76,6 +114,9 @@ export class BookingHistory {
         this.entries.push(entry);
     }
 
+    /**
+     * Returns a copy of all log entries in the history.
+     */
     getEntries(): string[] {
         return [...this.entries];
     }
