@@ -15,7 +15,7 @@ export class Booking {
     constructor(
         private id: string,
         private userId: string,
-        private showtime: ShowTime, 
+        private showtime: ShowTime,
         private seats: Seat[],
         private tickets: Ticket[],
         private payment: Payment | null,
@@ -29,31 +29,52 @@ export class Booking {
         this.status = BookingStatus.PENDING;
         this.date = new Date();
     }
-
+    /** 
+        * Returns the booking ID.
+        */
     getId(): string {
         return this.id;
     }
 
+    /** 
+     * Returns the user ID associated with the booking.
+     */
     getUserId(): string {
         return this.userId;
     }
 
-    getShowtime(): ShowTime { 
+    /**
+     * Returns the showtime associated with the booking.
+     */
+    getShowtime(): ShowTime {
         return this.showtime;
     }
 
+    /**
+     * Returns a copy of the seats in the booking.
+     */
     getSeats(): Seat[] {
         return [...this.seats];
     }
 
+    /**
+     * Returns a copy of the tickets in the booking.
+     */
     getTicket(): Ticket[] {
         return [...this.tickets];
     }
 
+    /**
+     * Returns the payment information, if available.
+     */
     getPayment(): Payment | null {
         return this.payment;
     }
 
+    /**
+     * Sets the payment for the booking.
+     * @param payment - The payment object to be set.
+     */
     setPayment(payment: Payment): void {
         if (!payment) {
             throw new Error("Payment is required");
@@ -61,18 +82,31 @@ export class Booking {
         this.payment = payment;
     }
 
+    /**
+     * Returns the booking history object.
+     */
     getBookingHistory(): BookingHistory {
         return this.bookingHistory;
     }
 
+    /**
+     * Returns the cancellation information if the booking was cancelled.
+     */
     getCancellation(): Cancellation | undefined {
         return this.cancellation;
     }
 
+    /**
+     * Returns the applied promotion if one exists.
+     */
     getPromotion(): Promotion | undefined {
         return this.promotion;
     }
 
+    /**
+     * Sets the current status of the booking.
+     * @param status - The new booking status (must be a valid BookingStatus).
+     */
     setStatus(status: string): void {
         const validStatuses = Object.keys(BookingStatus).map(
             key => BookingStatus[key as keyof typeof BookingStatus]
@@ -85,17 +119,32 @@ export class Booking {
         this.bookingHistory.addEntry(`Booking ${this.id} status updated to ${status} on ${new Date()}`);
     }
 
+    /**
+     * Returns the current booking status.
+     */
     getStatus(): string {
         return this.status;
     }
 
+    /**
+     * Returns the date the booking was created or last modified.
+     */
     getDate(): Date {
         return this.date;
     }
+
+    /**
+     * Updates the booking's date.
+     * @param date - New date to be set for the booking.
+     */
     setDate(date: Date): void {
         this.date = date;
     }
 
+    /**
+     * Confirms the booking if it has tickets, a payment, and is in PENDING status.
+     * Marks seats as booked and updates history.
+     */
     confirmBooking(): void {
         if (this.tickets.length === 0 || !this.payment || this.status !== BookingStatus.PENDING) {
             throw new Error("Cannot confirm booking: No tickets or payment, or invalid status");
@@ -106,6 +155,9 @@ export class Booking {
         this.bookingHistory.addEntry(`Booking confirmed on ${this.date}`);
     }
 
+    /**
+     * Cancels a confirmed booking, releases seats, issues refund, and records cancellation.
+     */
     cancelBooking(): void {
         if (this.status !== BookingStatus.CONFIRMED) {
             throw new Error("Cannot cancel booking: Booking is not in CONFIRMED status");
@@ -121,6 +173,11 @@ export class Booking {
         this.bookingHistory.addEntry(`Booking cancelled on ${this.date}`);
     }
 
+    /**
+     * Generates a new ticket for a specific seat in the booking.
+     * @param seat - The seat for which to generate a ticket.
+     * @returns The generated Ticket object.
+     */
     generateTicket(seat: Seat): Ticket {
         if (!seat) {
             throw new Error("Seat is required to generate a ticket");
@@ -141,6 +198,10 @@ export class Booking {
         return ticket;
     }
 
+    /**
+     * Removes a ticket from the booking by its ID and logs the removal in booking history.
+     * @param ticketId - ID of the ticket to be removed.
+     */
     removeTicket(ticketId: string): void {
         if (!ticketId) {
             throw new Error("Ticket ID is required to remove a ticket");
