@@ -17,7 +17,7 @@ function setupTestData() {
 
         const seats = [
             new Seat("SEAT-001", "A", "1", ZipZone.STANDARD, "10"),
-            new Seat("SEAT-002", "A", "2", ZipZone.PREMIUN, "15"), // ✅ Fixed spelling
+            new Seat("SEAT-002", "A", "2", ZipZone.PREMIUN, "15"), 
             new Seat("SEAT-003", "B", "1", ZipZone.VIP, "20"),
         ];
         seats.forEach(seat => movieRoom.addSeat(seat));
@@ -102,28 +102,55 @@ function runTests() {
 
     // User Story 3
     console.log("\nUser Story 3: Pay for booking and receive a digital ticket");
-    let user: User;
+    let chhea: User;
+    let soda: User;
     try {
-        user = new User(
-            "John Doe",
-            "john.doe@example.com",
+        // Register Chhea
+        chhea = new User(
+            "Chhea",
+            "chhea@example.com",
             "1234567890",
             "USER-001",
             "securePassword123"
         );
-        User.register(user);
+        User.register(chhea);
 
-        const selectedSeats = [seats[0], seats[1]];
-        const booking = user.createBooking(showtime, selectedSeats, "Credit Card");
-        console.log("Booking created:", {
-            bookingId: booking.getId(),
-            status: booking.getStatus(),
-            tickets: booking.getTicket().map(ticket => ({
+        // Register Soda
+        soda = new User(
+            "Soda",
+            "soda@example.com",
+            "0987654322",
+            "USER-002",
+            "anotherSecurePass456"
+        );
+        User.register(soda);
+
+        // Chhea books seats 1 & 2
+        const selectedSeatsChhea = [seats[0], seats[1]];
+        const bookingChhea = chhea.createBooking(showtime, selectedSeatsChhea, "Credit Card");
+        console.log("Chhea's Booking created:", {
+            bookingId: bookingChhea.getId(),
+            status: bookingChhea.getStatus(),
+            tickets: bookingChhea.getTicket().map(ticket => ({
                 ticketId: ticket.getTicketId(),
                 qrCode: ticket.generateQRCode(),
                 seatId: ticket.getSeat().getSeatId(),
             })),
-            total: booking.getPayment()?.getTotal(),
+            total: bookingChhea.getPayment()?.getTotal(),
+        });
+
+        // Soda books seat 3
+        const selectedSeatsSoda = [seats[2]];
+        const bookingSoda = soda.createBooking(showtime, selectedSeatsSoda, "Debit Card");
+        console.log("Soda's Booking created:", {
+            bookingId: bookingSoda.getId(),
+            status: bookingSoda.getStatus(),
+            tickets: bookingSoda.getTicket().map(ticket => ({
+                ticketId: ticket.getTicketId(),
+                qrCode: ticket.generateQRCode(),
+                seatId: ticket.getSeat().getSeatId(),
+            })),
+            total: bookingSoda.getPayment()?.getTotal(),
         });
     } catch (error) {
         console.error("Error in booking and payment:", error);
@@ -132,20 +159,25 @@ function runTests() {
     // User Story 4
     console.log("\nUser Story 4: View upcoming and past bookings");
     try {
-        user = User.login("john.doe@example.com", "securePassword123");
-        const bookingHistory = user.getBookingHistory();
-        console.log("Upcoming bookings:", bookingHistory.getUpcomingBookings().map(b => b.getId()));
-        console.log("Past bookings:", bookingHistory.getPastBookings().map(b => b.getId()));
+        chhea = User.login("chhea@example.com", "securePassword123");
+        const bookingHistoryChhea = chhea.getBookingHistory();
+        console.log("Chhea's Upcoming bookings:", bookingHistoryChhea.getUpcomingBookings().map(b => b.getId()));
+        console.log("Chhea's Past bookings:", bookingHistoryChhea.getPastBookings().map(b => b.getId()));
+
+        soda = User.login("soda@example.com", "anotherSecurePass456");
+        const bookingHistorySoda = soda.getBookingHistory();
+        console.log("Soda's Upcoming bookings:", bookingHistorySoda.getUpcomingBookings().map(b => b.getId()));
+        console.log("Soda's Past bookings:", bookingHistorySoda.getPastBookings().map(b => b.getId()));
     } catch (error) {
         console.error("Error in viewing booking history:", error);
     }
 
-    // ✅ User Story 5 (Fixed Staff Instantiation)
+    // User Story 5
     console.log("\nUser Story 5: Cinema staff checks QR code");
     try {
         const staff = new CinemaStaff(1, cinema, "Jane Smith", "jane.smith@example.com", "0987654321");
-        user = User.login("john.doe@example.com", "securePassword123");
-        const booking = user.getBookingHistory().getBookings()[0];
+        chhea = User.login("chhea@example.com", "securePassword123");
+        const booking = chhea.getBookingHistory().getBookings()[0];
         const ticket = booking.getTicket()[0];
         const isValidQR = staff.checkQRCode(ticket.generateQRCode());
         console.log("QR code validation:", isValidQR ? "Valid" : "Invalid");
@@ -156,16 +188,16 @@ function runTests() {
     // User Story 6
     console.log("\nUser Story 6: Rate and review movie experience");
     try {
-        user = User.login("john.doe@example.com", "securePassword123");
+        chhea = User.login("chhea@example.com", "securePassword123");
         const review = new Review(
             1,
             showtime.getShowtimeId(),
             "4.5",
             "Great movie, loved the action scenes!",
-            user,
+            chhea,
             movie
         );
-        user.addReview(review);
+        chhea.addReview(review);
         movie.addReview(review);
         console.log("Review added:", {
             reviewId: review.getReviewId(),
