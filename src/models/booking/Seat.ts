@@ -48,7 +48,6 @@ export class Seat {
     getMovieRoom(): MovieRoom | null {
         return this.movieRoom || null;
     }
-
     /**
      * Updates the seat's basic information.
      * @param seatId - New seat ID
@@ -67,7 +66,6 @@ export class Seat {
         this.zipZone = zipZone;
         this.price = price.toString();
     }
-
     /**
      * Gets the seat's ID.
      * @returns Seat ID as a string.
@@ -75,7 +73,6 @@ export class Seat {
     getSeatId(): string {
         return this.seatId;
     }
-
     /**
      * Gets the current seat status.
      * @returns SeatStatus enum value.
@@ -83,7 +80,6 @@ export class Seat {
     getStatus(): SeatStatus {
         return this.status;
     }
-
     /**
      * Updates the status of the seat (e.g., to RESERVED or OCCUPIED).
      * @param status - New status value (must be a valid SeatStatus).
@@ -98,7 +94,6 @@ export class Seat {
         }
         this.status = status;
     }
-
     /**
      * Links this seat to a specific MovieRoom.
      * @param movieRoom - MovieRoom object to associate with this seat.
@@ -106,7 +101,6 @@ export class Seat {
     setMovieRoom(movieRoom: MovieRoom): void {
         this.movieRoom = movieRoom;
     }
-
     /**
      * Gets the row label of the seat.
      * @returns Row label as a string.
@@ -114,7 +108,6 @@ export class Seat {
     getRow(): string {
         return this.row;
     }
-
     /**
      * Gets the seat number in the row.
      * @returns Seat number as a string.
@@ -122,7 +115,6 @@ export class Seat {
     getSeatNum(): string {
         return this.seatNum;
     }
-
     /**
      * Gets the zip zone of the seat.
      * @returns ZipZone enum value.
@@ -130,7 +122,6 @@ export class Seat {
     getZipZone(): ZipZone {
         return this.zipZone;
     }
-
     /**
      * Gets the price of the seat.
      * @returns Price as a string.
