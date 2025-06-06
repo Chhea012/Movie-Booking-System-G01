@@ -2,13 +2,11 @@ import { Seat } from "../booking/Seat";
 import { Cinema } from "../cinema/Cinema";
 import { ShowTime } from "./ShowTime";
 import { SeatStatus } from "../enum/SeatStatus";
-
 /**
  * Represents a movie room within a cinema, holding seats and showtimes.
  */
 export class MovieRoom {
     private showtimes: ShowTime[] = [];
-
     /**
      * Constructor to initialize a movie room.
      * @param id - Unique identifier for the movie room.
@@ -22,7 +20,6 @@ export class MovieRoom {
         private cinema: Cinema,
         private seats: Seat[] = []
     ) {}
-
     /**
      * Adds a seat to the movie room and sets the seat's room reference.
      * @param seat - The seat to be added.
@@ -35,7 +32,6 @@ export class MovieRoom {
         this.seats.push(seat);
         seat.setMovieRoom(this);
     }
-
     /**
      * Removes a seat from the movie room by seat ID.
      * @param seatId - The ID of the seat to remove.
@@ -47,7 +43,6 @@ export class MovieRoom {
         }
         this.seats = this.seats.filter(seat => seat.getSeatId() !== seatId);
     }
-
     /**
      * Retrieves all seats in the movie room.
      * @returns An array of Seat instances.
@@ -55,7 +50,6 @@ export class MovieRoom {
     getSeats(): Seat[] {
         return [...this.seats];
     }
-
     /**
      * Retrieves only available seats in the movie room.
      * @returns An array of available Seat instances.
@@ -63,7 +57,6 @@ export class MovieRoom {
     getAvailableSeats(): Seat[] {
         return this.seats.filter(seat => seat.getStatus() === SeatStatus.AVAILABLE);
     }
-
     /**
      * Updates the ID and name of the movie room.
      * @param roomId - New ID for the room.
@@ -77,7 +70,6 @@ export class MovieRoom {
         this.id = roomId;
         this.name = name;
     }
-
     /**
      * Retrieves the cinema associated with the movie room.
      * @returns The associated Cinema instance.
@@ -85,7 +77,6 @@ export class MovieRoom {
     getCinema(): Cinema {
         return this.cinema;
     }
-
     /**
      * Returns the list of available seats in the movie room.
      * @returns An array of available Seat instances.
@@ -93,7 +84,6 @@ export class MovieRoom {
     viewSeatAvailability(): Seat[] {
         return this.getAvailableSeats();
     }
-
     /**
      * Retrieves all showtimes scheduled in this movie room.
      * @returns An array of ShowTime instances.
@@ -101,7 +91,6 @@ export class MovieRoom {
     getShowtimes(): ShowTime[] {
         return [...this.showtimes];
     }
-
     /**
      * Adds a showtime to the movie room.
      * @param showtime - The ShowTime instance to add.
@@ -113,7 +102,6 @@ export class MovieRoom {
         }
         this.showtimes.push(showtime);
     }
-
     /**
      * Gets the unique ID of the movie room.
      * @returns The movie room ID.
@@ -121,7 +109,6 @@ export class MovieRoom {
     getId(): string {
         return this.id;
     }
-
     /**
      * Gets the name of the movie room.
      * @returns The movie room name.
