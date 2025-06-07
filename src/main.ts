@@ -7,7 +7,62 @@ import { Seat } from "./models/booking/Seat";
 import { ZipZone } from "./models/enum/ZipZone";
 import { MovieManager } from "./models/showtime/MovieManager";
 import { Review } from "./models/review/Review";
-import { CinemaStaff } from "./models/cinema/CinemaStaff"; // ✅ Add this import
+import { CinemaStaff } from "./models/cinema/CinemaStaff";
+
+// Notification Service class to handle movie notifications
+class NotificationService {
+    private subscribers: Set<User>;
+
+    constructor() {
+        this.subscribers = new Set();
+    }
+
+    subscribe(user: User) {
+        this.subscribers.add(user);
+    }
+
+    unsubscribe(user: User) {
+        this.subscribers.delete(user);
+    }
+
+    notifyNewMovie(movie: Movie) {
+        this.subscribers.forEach(user => {
+            try {
+                this.sendNotification(user, movie);
+            } catch (error) {
+                console.error(`Failed to notify user ${user.getName()}:`, error);
+            }
+        });
+    }
+
+    sendNotification(user: User, movie: Movie) {
+        console.log(`Notification sent to ${user.getName()}: New movie "${movie.getTitle()}" is now available!`);
+        // In a real system, this could send an email or push notification
+    }
+}
+
+// Extend MovieManager to include notification functionality
+class ExtendedMovieManager extends MovieManager {
+    private notificationService: NotificationService;
+
+    constructor() {
+        super();
+        this.notificationService = new NotificationService();
+    }
+
+    addMovie(movie: Movie) {
+        super.addMovie(movie);
+        this.notificationService.notifyNewMovie(movie);
+    }
+
+    subscribeUser(user: User) {
+        this.notificationService.subscribe(user);
+    }
+
+    unsubscribeUser(user: User) {
+        this.notificationService.unsubscribe(user);
+    }
+}
 
 function setupTestData() {
     try {
@@ -17,7 +72,7 @@ function setupTestData() {
 
         const seats = [
             new Seat("SEAT-001", "A", "1", ZipZone.STANDARD, "10"),
-            new Seat("SEAT-002", "A", "2", ZipZone.PREMIUN, "15"), // ✅ Fixed spelling
+            new Seat("SEAT-002", "A", "2", ZipZone.PREMIUN, "15"),
             new Seat("SEAT-003", "B", "1", ZipZone.VIP, "20"),
         ];
         seats.forEach(seat => movieRoom.addSeat(seat));
@@ -44,10 +99,19 @@ function setupTestData() {
         movie.addShowTime(showtime);
         cinema.addShowtime(showtime);
 
-        const movieManager = new MovieManager();
+        const movieManager = new ExtendedMovieManager();
+        const user = new User(
+            "John Doe",
+            "john.doe@example.com",
+            "1234567890",
+            "USER-001",
+            "securePassword123"
+        );
+        User.register(user);
+        movieManager.subscribeUser(user);
         movieManager.addMovie(movie);
 
-        return { cinema, movieRoom, movie, showtime, movieManager, seats };
+        return { cinema, movieRoom, movie, showtime, movieManager, seats, user };
     } catch (error) {
         console.error("Error in setupTestData:", error);
         throw error;
@@ -63,7 +127,7 @@ function runTests() {
         return;
     }
 
-    const { cinema, movieRoom, movie, showtime, movieManager, seats } = testData;
+    const { cinema, movieRoom, movie, showtime, movieManager, seats, user } = testData;
 
     console.log("=== Starting Test Suite ===");
 
@@ -102,17 +166,7 @@ function runTests() {
 
     // User Story 3
     console.log("\nUser Story 3: Pay for booking and receive a digital ticket");
-    let user: User;
     try {
-        user = new User(
-            "John Doe",
-            "john.doe@example.com",
-            "1234567890",
-            "USER-001",
-            "securePassword123"
-        );
-        User.register(user);
-
         const selectedSeats = [seats[0], seats[1]];
         const booking = user.createBooking(showtime, selectedSeats, "Credit Card");
         console.log("Booking created:", {
@@ -132,7 +186,6 @@ function runTests() {
     // User Story 4
     console.log("\nUser Story 4: View upcoming and past bookings");
     try {
-        user = User.login("john.doe@example.com", "securePassword123");
         const bookingHistory = user.getBookingHistory();
         console.log("Upcoming bookings:", bookingHistory.getUpcomingBookings().map(b => b.getId()));
         console.log("Past bookings:", bookingHistory.getPastBookings().map(b => b.getId()));
@@ -140,11 +193,10 @@ function runTests() {
         console.error("Error in viewing booking history:", error);
     }
 
-    // ✅ User Story 5 (Fixed Staff Instantiation)
+    // User Story 5
     console.log("\nUser Story 5: Cinema staff checks QR code");
     try {
         const staff = new CinemaStaff(1, cinema, "Jane Smith", "jane.smith@example.com", "0987654321");
-        user = User.login("john.doe@example.com", "securePassword123");
         const booking = user.getBookingHistory().getBookings()[0];
         const ticket = booking.getTicket()[0];
         const isValidQR = staff.checkQRCode(ticket.generateQRCode());
@@ -156,7 +208,6 @@ function runTests() {
     // User Story 6
     console.log("\nUser Story 6: Rate and review movie experience");
     try {
-        user = User.login("john.doe@example.com", "securePassword123");
         const review = new Review(
             1,
             showtime.getShowtimeId(),
@@ -176,6 +227,23 @@ function runTests() {
         console.log("Movie average rating:", movie.getAverageRating());
     } catch (error) {
         console.error("Error in adding review:", error);
+    }
+
+    // User Story 7
+    console.log("\nUser Story 7: Receive notification for new movies");
+    try {
+        const newMovie = new Movie(
+            "MOV-002",
+            "New Release",
+            "Comedy",
+            [],
+            "A hilarious new comedy.",
+            "1h 45m",
+            "2025-06-08"
+        );
+        movieManager.addMovie(newMovie);
+    } catch (error) {
+        console.error("Error in new movie notification:", error);
     }
 
     console.log("\n=== Test Suite Completed ===");
